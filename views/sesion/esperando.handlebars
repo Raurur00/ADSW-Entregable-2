@@ -1,0 +1,23 @@
+<script src="/socket.io/socket.io.js"></script>
+<div id="mario-chat">
+    <div id="chat-window">
+        <div id="output"></div>
+    </div>
+    <input type="hidden" id="handle" value="{{{username}}}">
+    <input type="hidden" id="email" value="{{{emailInv}}}">
+    <input type="hidden" id="idSesion" value="{{{idSesion}}}">
+    {{username}}: <input id="message" type="text" placeholder="Message" onkeypress="myFunction(event)">
+    <button id="send">Send</button>
+</div>
+<br><br>
+<script src="/js/cliente.js"></script>
+
+{{#if creador}}
+    <form method="post" action="/sesion/iniciar/{{{idSesionEnc}}}/{{{idEnc}}}">
+        <input type="hidden" id="iniciar" value="{{{idSesion}}}">
+        <input type="hidden" id="handle" value="{{{username}}}">
+        <button type="submit" class="btn btn-lg btn-info">iniciar sesión</button>
+    </form>
+    <script src="/js/moderador.js"></script>
+{{/if}}
+

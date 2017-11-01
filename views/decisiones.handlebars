@@ -1,0 +1,54 @@
+<script src="/socket.io/socket.io.js"></script>
+<div id="counter"></div>
+
+{{hor}}, {{mi}}, {{se}}, {{n}}
+
+Escenario: {{esc.objetivo}}<br>
+<body onload="mueveReloj({{hor}}, {{mi}}, {{se}})">
+<center><big><big><big><b>
+</b></big></big></big></center>
+</body>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th> </th>
+        <th> Nombre </th>
+        <th> Mecanismo </th>
+        <th> Resultado </th>
+    </tr>
+    </thead>
+    <tbody>
+<form method="post" action="/mandar_decisiones">
+    {{#each dec as |decision|}}
+        <td><input type="checkbox" class="checks" name = "lang[]" value = {{decision.id}}></td><br>
+        <td>{{decision.nombre}}</td>
+        <td>{{decision.mecanismo}}</td>
+        <td>{{decision.resultado}}</td></tbody>
+        <input type="hidden" name="id[]" value="{{decision.id}}">
+    {{/each}}
+</table>
+
+
+<button type="submit" class="btn btn-default"> Enviar</button>
+
+
+</form>
+</tbody>
+
+<script> var socket = io.connect(window.location.host);
+
+var counter = document.getElementById('counter');
+console.log('iniciando timer..');
+socket.emit('iniciar',{
+    hora: {{hor}},
+    minuto: {{mi}},
+    segundo: {{se}}
+});
+
+
+socket.on('timer',function (data) {
+    counter.innerHTML = data.countdown;
+});
+
+</script>

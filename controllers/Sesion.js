@@ -1,0 +1,38 @@
+var models  = require('../models');
+module.exports=function(titulo,descrip,moderador) {
+    this.titulo=titulo;
+    this.descrip=descrip;
+    this.moderador=moderador;
+    this.activada= false;
+    this.invitados= [];
+    this.escenarios= [];
+    this.id= null;
+    this.creador= null;
+    this.url= '/';
+    this.username= false;
+    this.conectados= [];
+
+    this.getTitulo=function(){
+        return this.titulo;
+    };
+    this.setTitulo=function(titulo){
+        this.titulo=titulo;
+    };
+
+    this.crearSesion=function (resolve) {
+        models.Sesion.create({
+            titulo: this.titulo,
+            descripcion: this.descrip,
+            ParticipanteId: this.moderador
+        }).then(function (result) {
+            return resolve(result.id);
+            /*require('../controllers/email')(nodemailer,crypto,res, req);*/
+        });
+    };
+
+    this.crearEscenarios=function () {
+        this.escenarios.forEach(function(esc) {
+            esc.crearEscenario();
+        });
+    }
+};

@@ -1,3 +1,4 @@
+var models  = require('../models');
 module.exports = function Escenario(objetivo,hh,mm,ss,sesionID){
     this.objetivo=objetivo;
     this.hh=hh;
@@ -6,18 +7,26 @@ module.exports = function Escenario(objetivo,hh,mm,ss,sesionID){
     this.sesionID=sesionID;
     this.id=null;
 
-    this.crearEscenario = function(){
+    this.crearEscenario = function(resolve){
         models.Escenario.create({
             objetivo: this.objetivo,
             hh: this.hh,
             mm: this.mm,
             ss: this.ss
         }).then(function(result) {
-            this.id = result.id;
+            /*this.id = result.id;
             models.Sesion_esc.create({
                 EscenarioId: result.id,
                 SesionId: this.sesionID
-            });
+            });*/
+            return resolve(result.id);
         });
     };
+
+    this.crearSesionEsc = function() {
+        models.Sesion_esc.create({
+            EscenarioId: this.id,
+            SesionId: this.sesionID
+        });
+    }
 };

@@ -2,6 +2,7 @@
  * Created by famancil on 21-08-16.
  */
 var Sesion = require('../controllers/Sesion');
+var Escenario = require('../controllers/Escenario');
 var models  = require('../models');
 var decrypt = require('../controllers/decrypt');
 var encrypt = require('../controllers/encrypt');
@@ -132,7 +133,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         }
         var repetido = false;
         listaSesiones[idSesion].escenarios.forEach(function(esc) {
-            if (esc.esc == req.body.esc) {
+            if (esc.objetivo == req.body.esc) {
                 repetido = true;
                 return;
             }
@@ -147,7 +148,15 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             return;
         }
         if (!errors) {
-            listaSesiones[idSesion].escenarios.push({
+            new Promise(function(resolve,reject){
+                esc = new Escenario(req.body.esc,req.body.hh,req.body.mm,req.body.ss,idSesion);
+                esc.crearEscenario(resolve);
+            }).then(function(data){
+                esc.id=data;
+                esc.crearSesionEsc();
+                listaSesiones[idSesion].escenarios.push(esc);
+            });
+            /*listaSesiones[idSesion].escenarios.push({
                 esc: req.body.esc,
                 hh: req.body.hh,
                 mm: req.body.mm,
@@ -156,8 +165,9 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             timer2.hr = req.body.hh;
             timer2.min = req.body.mm;
             timer2.seg = req.body.ss;
-            console.log(listaSesiones[idSesion]);
+            console.log(listaSesiones[idSesion]);*/
         }
+        console.log(listaSesiones[idSesion].escenarios);
         res.render('sesion/crear_sesion', {
             errors: errors,
             sesion: listaSesiones[idSesion],

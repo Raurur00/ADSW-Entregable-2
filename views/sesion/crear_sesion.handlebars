@@ -27,10 +27,11 @@
     {{#each sesion.invitados as |invitado|}}
         {{invitado}} <br>
     {{/each}}
+    {{idSesionEnc}} <br>
     <div class="form-group">
         <input type="text" class="form-control" placeholder="escribe el email de tu invitado aquí" name="email">
     </div>
-    <button type="submit" class="btn btn-default" formaction="/crear_sesion/invitar">invitar</button>
+    <button type="submit" class="btn btn-default" formaction="/crear_sesion/invitar/{{{idSesionEnc}}}">invitar</button>
     <br><br>
 
     <label>escenarios</label><br>

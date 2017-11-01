@@ -12,7 +12,7 @@ var opts = {
         freezeTableName: true
     }
 }
-var sequelize = new Sequelize('proyecto', 'root', 'Mariobros1!',opts);
+var sequelize = new Sequelize('proyecto', 'root', 'mariobros1',opts);
 var db        = {};
 
 fs

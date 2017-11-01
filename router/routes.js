@@ -66,7 +66,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
     });
     ///////////////////// CREAR SESION ///////////////////////////////////////
     app.get('/crear_sesion/:idSesion', function (req, res) {
-        res.render('sesion/crear_sesion', {sesion: listaSesiones[decrypt(req.params.idSesion,crypto)]});
+        res.render('sesion/crear_sesion', {sesion: listaSesiones[decrypt(req.params.idSesion,crypto)], idSesionEnc: req.params.idSesion});
     });
 
     app.post('/crear_sesion/invitar/:idSesion', function(req, res) {
@@ -74,27 +74,30 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         req.checkBody('email', 'Email is not valid').isEmail();
         var errors = req.validationErrors();
         var repetido = false;
-        console.log(req);
-        sesion.invitados.forEach(function(invitado) {
+        console.log(decrypt(req.params.idSesion,crypto));
+        console.log(listaSesiones);
+        listaSesiones[decrypt(req.params.idSesion,crypto)].invitados.forEach(function(invitado) {
             if (invitado == req.body.email) {
                 repetido = true;
                 return;
             }
         });
         if (repetido) {
-            res.render('sesion/crear_sesion', {sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip, repetido: true});
+            res.render('sesion/crear_sesion', {sesion: listaSesiones[decrypt(req.params.idSesion,crypto)], idSesionEnc: req.params.idSesion, titulo: req.body.titulo, descrip: req.body.descrip, repetido: true});
             return;
         }
         if (req.user) {
             if(req.user.email == req.body.email) {
-                res.render('sesion/crear_sesion', {errors: errors, sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip, propio: true});
+                res.render('sesion/crear_sesion/', {sesion: listaSesiones[decrypt(req.params.idSesion,crypto)], idSesionEnc: req.params.idSesion,
+                    errors: errors, titulo: req.body.titulo, descrip: req.body.descrip, propio: true});
                 return;
             }
         }
         if (!errors) {
-            sesion.invitados.push(req.body.email);
+            listaSesiones[decrypt(req.params.idSesion,crypto)].invitados.push(req.body.email);
         }
-        res.render('sesion/crear_sesion', {errors: errors, sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip});
+        res.render('sesion/crear_sesion', {sesion: listaSesiones[decrypt(req.params.idSesion,crypto)], idSesionEnc: req.params.idSesion,
+            errors: errors, sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip});
     });
 
     app.post('/crear_sesion/esc', function(req, res) {

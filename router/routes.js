@@ -3,6 +3,7 @@
  */
 var Sesion = require('../controllers/Sesion');
 var Escenario = require('../controllers/Escenario');
+var Participante = require('../controllers/Participante');
 var models  = require('../models');
 var decrypt = require('../controllers/decrypt');
 var encrypt = require('../controllers/encrypt');
@@ -105,7 +106,8 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             }
         }
         if (!errors) {
-            listaSesiones[idSesion].invitados.push(req.body.email);
+            participante = new Participante(req.body.email);
+            listaSesiones[idSesion].invitados.push(participante);
             console.log(listaSesiones[idSesion]);
         }
         res.render('sesion/crear_sesion', {
@@ -175,32 +177,50 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         });
     });
 
-    app.post('/crear_sesion', function(req, res) {
-        req.checkBody('titulo', 'escribe un titulo para la sesión').notEmpty();
-        req.checkBody('descrip', 'escribe una descripción de la sesión').notEmpty();
-        var errors = req.validationErrors();
-        if (sesion.invitados.length == 0 && sesion.escenarios.length == 0) {
-            res.render('sesion/crear_sesion', {errors: errors, sesion: sesion,
-                noinv: true, noesc: true, titulo: req.body.titulo, descrip: req.body.descrip});
+    app.post('/crear_sesion/:idSesionEnc', function(req, res) {
+        var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
+        if (listaSesiones[idSesion].invitados.length == 0 && listaSesiones[idSesion].escenarios.length == 0) {
+            res.render('sesion/crear_sesion', {
+                errors: errors,
+                sesion: listaSesiones[idSesion],
+                noinv: true,
+                noesc: true,
+                idSesionEnc: req.params.idSesionEnc
+            });
             return;
         }
-        else if (sesion.invitados.length == 0) {
-            res.render('sesion/crear_sesion', {errors: errors, sesion: sesion,
-                noinv: true, titulo: req.body.titulo, descrip: req.body.descrip});
+        else if (listaSesiones[idSesion].invitados.length == 0) {
+            res.render('sesion/crear_sesion', {
+                errors: errors,
+                sesion: listaSesiones[idSesion],
+                noinv: true,
+                idSesionEnc: req.params.idSesionEnc
+            });
             return;
         }
-        else if (sesion.escenarios.length == 0) {
-            res.render('sesion/crear_sesion', {errors: errors, sesion: sesion,
-                noesc: true, titulo: req.body.titulo, descrip: req.body.descrip});
-            return;
-        }
-        else if (errors) {
-            res.render('sesion/crear_sesion', {errors: errors, sesion: sesion,
-                titulo: req.body.titulo, descrip: req.body.descrip});
+        else if (listaSesiones[idSesion].escenarios.length == 0) {
+            res.render('sesion/crear_sesion', {
+                errors: errors,
+                sesion: listaSesiones[idSesion],
+                noesc: true,
+                idSesionEnc: req.params.idSesionEnc
+            });
             return;
         }
         else {
-            sesion.crearSesion(req, res,nodemailer,crypto);
+            var smtpTransport = nodemailer.createTransport({
+                service: "gmail",
+                host: "smtp.gmail.com",
+                auth: {
+                    user: "i.t.force.76@gmail.com",
+                    pass: "mariobros1"
+                }
+            });
+
+            listaSesiones[idSesion].invitados.forEach(function (invitado) {
+                invitado.enviarEmail(smtpTransport,crypto,req.params.idSesionEnc,res);
+            });
+
             return;
         }
     });

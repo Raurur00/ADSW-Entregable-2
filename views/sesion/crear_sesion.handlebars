@@ -1,9 +1,4 @@
 <h2 class="page-header">Creando la sesión...</h2>
-{{#if errors}}
-    {{#each errors}}
-        <div class="alert alert-danger">{{msg}}</div>
-    {{/each}}
-{{/if}}
 {{#if propio}}
     <div class="alert alert-danger">no puedes invitarte a ti mismo</div>
 {{/if}}
@@ -22,12 +17,11 @@
 {{#if noinv}}
     <div class="alert alert-danger">invita personas antes de comenzar la sesión</div>
 {{/if}}
-<form method="post" action="/crear_sesion">
+<form method="post" action="/crear_sesion/{{{idSesionEnc}}}">
     <label>invitados</label><br>
     {{#each sesion.invitados as |invitado|}}
-        {{invitado}} <br>
+        {{invitado.email}} <br>
     {{/each}}
-    {{idSesionEnc}} <br>
     <div class="form-group">
         <input type="text" class="form-control" placeholder="escribe el email de tu invitado aquí" name="email">
     </div>

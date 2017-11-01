@@ -12,13 +12,6 @@ module.exports=function(titulo,descrip,moderador) {
     this.username= false;
     this.conectados= [];
 
-    this.getTitulo=function(){
-        return this.titulo;
-    };
-    this.setTitulo=function(titulo){
-        this.titulo=titulo;
-    };
-
     this.crearSesion=function (resolve) {
         models.Sesion.create({
             titulo: this.titulo,
@@ -26,7 +19,6 @@ module.exports=function(titulo,descrip,moderador) {
             ParticipanteId: this.moderador
         }).then(function (result) {
             return resolve(result.id);
-            /*require('../controllers/email')(nodemailer,crypto,res, req);*/
         });
     };
 

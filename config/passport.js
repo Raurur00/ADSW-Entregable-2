@@ -12,7 +12,7 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : 'mariobros1'
+    password : 'Mariobros1!'
 });
 
 connection.query('USE proyecto');

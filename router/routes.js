@@ -211,6 +211,11 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
                 invitado.enviarEmail(smtpTransport,crypto,req.params.idSesionEnc,res);
             });
 
+            res.redirect('/sesion/moderador/esperando/'
+                + encrypt(String(sesion.id), crypto)+'/'
+                + encrypt(String(sesion.creador),crypto)
+            );
+
             return;
         }
     });

@@ -65,61 +65,89 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         });
     });
     ///////////////////// CREAR SESION ///////////////////////////////////////
-    app.get('/crear_sesion/:idSesion', function (req, res) {
-        res.render('sesion/crear_sesion', {sesion: listaSesiones[decrypt(req.params.idSesion,crypto)]});
+    app.get('/crear_sesion/:idSesionEnc', function (req, res) {
+        res.render('sesion/crear_sesion', {
+            sesion: listaSesiones[decrypt(req.params.idSesionEnc,crypto)],
+            idSesionEnc: req.params.idSesionEnc
+        });
     });
 
-    app.post('/crear_sesion/invitar/:idSesion', function(req, res) {
+    app.post('/crear_sesion/invitar/:idSesionEnc', function(req, res) {
         req.checkBody('email', 'Email is required').notEmpty();
         req.checkBody('email', 'Email is not valid').isEmail();
         var errors = req.validationErrors();
         var repetido = false;
-        console.log(req);
-        sesion.invitados.forEach(function(invitado) {
+        var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
+        listaSesiones[idSesion].invitados.forEach(function(invitado) {
             if (invitado == req.body.email) {
                 repetido = true;
                 return;
             }
         });
         if (repetido) {
-            res.render('sesion/crear_sesion', {sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip, repetido: true});
+            res.render('sesion/crear_sesion', {
+                sesion:listaSesiones[idSesion],
+                repetido: true,
+                idSesionEnc: req.params.idSesionEnc
+            });
             return;
         }
         if (req.user) {
             if(req.user.email == req.body.email) {
-                res.render('sesion/crear_sesion', {errors: errors, sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip, propio: true});
+                res.render('sesion/crear_sesion', {
+                    errors: errors,
+                    sesion: listaSesiones[idSesion],
+                    propio: true,
+                    idSesionEnc: req.params.idSesionEnc
+                });
                 return;
             }
         }
         if (!errors) {
-            sesion.invitados.push(req.body.email);
+            listaSesiones[idSesion].invitados.push(req.body.email);
+            console.log(listaSesiones[idSesion]);
         }
-        res.render('sesion/crear_sesion', {errors: errors, sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip});
+        res.render('sesion/crear_sesion', {
+            errors: errors,
+            sesion: listaSesiones[idSesion],
+            idSesionEnc: req.params.idSesionEnc
+        });
     });
 
-    app.post('/crear_sesion/esc', function(req, res) {
+    app.post('/crear_sesion/esc/:idSesionEnc', function(req, res) {
         req.checkBody('esc', 'escribe un objetivo').notEmpty();
         req.checkBody('hh', 'la hora debe ser un número entero').isInt();
         req.checkBody('mm', 'los minutos deben ser un número entero').isInt();
         req.checkBody('ss', 'los segundos deben ser un número entero').isInt();
         var errors = req.validationErrors();
+        var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
         if (!req.body.hh && !req.body.mm && !req.body.ss) {
-            res.render('sesion/crear_sesion', {errors: errors, sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip, notiempo: true});
+            res.render('sesion/crear_sesion', {
+                errors: errors,
+                sesion: listaSesiones[idSesion],
+                notiempo: true,
+                idSesionEnc: req.params.idSesionEnc
+            });
             return;
         }
         var repetido = false;
-        sesion.escenarios.forEach(function(esc) {
+        listaSesiones[idSesion].escenarios.forEach(function(esc) {
             if (esc.esc == req.body.esc) {
                 repetido = true;
                 return;
             }
         });
         if (repetido) {
-            res.render('sesion/crear_sesion', {errors: errors, sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip, escrepetido: true});
+            res.render('sesion/crear_sesion', {
+                errors: errors,
+                sesion: listaSesiones[idSesion],
+                escrepetido: true,
+                idSesionEnc: req.params.idSesionEnc
+            });
             return;
         }
         if (!errors) {
-            sesion.escenarios.push({
+            listaSesiones[idSesion].escenarios.push({
                 esc: req.body.esc,
                 hh: req.body.hh,
                 mm: req.body.mm,
@@ -128,8 +156,13 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             timer2.hr = req.body.hh;
             timer2.min = req.body.mm;
             timer2.seg = req.body.ss;
+            console.log(listaSesiones[idSesion]);
         }
-        res.render('sesion/crear_sesion', {errors: errors, sesion: sesion, titulo: req.body.titulo, descrip: req.body.descrip});
+        res.render('sesion/crear_sesion', {
+            errors: errors,
+            sesion: listaSesiones[idSesion],
+            idSesionEnc: req.params.idSesionEnc
+        });
     });
 
     app.post('/crear_sesion', function(req, res) {

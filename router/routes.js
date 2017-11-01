@@ -186,7 +186,6 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
         if (listaSesiones[idSesion].invitados.length == 0 && listaSesiones[idSesion].escenarios.length == 0) {
             res.render('sesion/crear_sesion', {
-                errors: errors,
                 sesion: listaSesiones[idSesion],
                 noinv: true,
                 noesc: true,
@@ -196,7 +195,6 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         }
         else if (listaSesiones[idSesion].invitados.length == 0) {
             res.render('sesion/crear_sesion', {
-                errors: errors,
                 sesion: listaSesiones[idSesion],
                 noinv: true,
                 idSesionEnc: req.params.idSesionEnc
@@ -205,7 +203,6 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         }
         else if (listaSesiones[idSesion].escenarios.length == 0) {
             res.render('sesion/crear_sesion', {
-                errors: errors,
                 sesion: listaSesiones[idSesion],
                 noesc: true,
                 idSesionEnc: req.params.idSesionEnc
@@ -226,9 +223,9 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
                 invitado.enviarEmail(smtpTransport,crypto,req.params.idSesionEnc,res);
             });
 
-            res.redirect('/sesion/moderador/esperando/'
-                + encrypt(String(sesion.id), crypto)+'/'
-                + encrypt(String(sesion.creador),crypto)
+            res.redirect('/sesion/moderador/username/'
+                + req.params.idSesionEnc+'/'
+                + encrypt(String(listaSesiones[idSesion].creador),crypto)
             );
 
             return;
@@ -236,16 +233,16 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
     });
 
     ///////////////////////// PANTALLA USERNAME ////////////////////////////////
-    app.get('/sesion/moderador/username/:idSesion/:emailInv', function (req, res){
-        sesion.url = '/sesion/moderador/esperando/'+req.params.idSesion+ '/'+req.params.emailInv;
-        sesion.activada = true;
-        var idSesion = decrypt(req.params.idSesion,crypto);
-        var emailInv = decrypt(req.params.emailInv,crypto);
+    app.get('/sesion/moderador/username/:idSesionEnc/:emailInvEnc', function (req, res){
+        var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
+        var emailInv = decrypt(req.params.emailInvEnc,crypto);
+        listaSesiones[idSesion].url = '/sesion/moderador/esperandod/'+req.params.idSesion+ '/'+req.params.emailInv;
+        listaSesiones.activada = true;
         res.render('sesion/username', {
             idSesion: req.body.idSesion,
             emailInv: req.body.emailInv,
-            idSesionEnc: req.params.idSesion,
-            emailInvEnc: req.params.emailInv,
+            idSesionEnc: req.params.idSesionEnc,
+            emailInvEnc: req.params.emailInvEnc,
             creador: true
         });
     });

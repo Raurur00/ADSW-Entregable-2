@@ -157,6 +157,11 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
                 esc.id=data;
                 esc.crearSesionEsc();
                 listaSesiones[idSesion].escenarios.push(esc);
+                res.render('sesion/crear_sesion', {
+                    errors: errors,
+                    sesion: listaSesiones[idSesion],
+                    idSesionEnc: req.params.idSesionEnc
+                });
             });
             /*listaSesiones[idSesion].escenarios.push({
                 esc: req.body.esc,
@@ -168,13 +173,13 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             timer2.min = req.body.mm;
             timer2.seg = req.body.ss;
             console.log(listaSesiones[idSesion]);*/
+        } else {
+            res.render('sesion/crear_sesion', {
+                errors: errors,
+                sesion: listaSesiones[idSesion],
+                idSesionEnc: req.params.idSesionEnc
+            });
         }
-        console.log(listaSesiones[idSesion].escenarios);
-        res.render('sesion/crear_sesion', {
-            errors: errors,
-            sesion: listaSesiones[idSesion],
-            idSesionEnc: req.params.idSesionEnc
-        });
     });
 
     app.post('/crear_sesion/:idSesionEnc', function(req, res) {

@@ -5,6 +5,7 @@ module.exports=function(titulo,descrip,moderador) {
     this.moderador=moderador;
     this.activada= false;
     this.invitados= [];
+    this.participantes=[];
     this.escenarios= [];
     this.id= null;
     this.creador=false;

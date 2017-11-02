@@ -236,7 +236,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
     app.get('/sesion/moderador/username/:idSesionEnc/:emailInvEnc', function (req, res){
         var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
         var emailInv = decrypt(req.params.emailInvEnc,crypto);
-        listaSesiones[idSesion].url = '/sesion/moderador/esperandod/'+req.params.idSesion+ '/'+req.params.emailInv;
+        listaSesiones[idSesion].url = '/sesion/moderador/esperando/'+req.params.idSesion+ '/'+req.params.emailInv;
         listaSesiones.activada = true;
         res.render('sesion/username', {
             idSesion: req.body.idSesion,
@@ -249,9 +249,9 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
 
 
     app.get('/sesion/username/:idSesion/:emailInv', function (req, res){
-        sesion.url = '/sesion/esperando/'+req.params.idSesion+ '/' + req.params.emailInv;
-        sesion.activada = true;
         var idSesion = decrypt(req.params.idSesion,crypto);
+        listaSesiones[idSesion].url = '/sesion/esperando/'+req.params.idSesion+ '/' + req.params.emailInv;
+        listaSesiones[idSesion].activada = true;
         var emailInv = decrypt(req.params.emailInv,crypto);
         res.render('sesion/username', {
                 idSesion: idSesion,
@@ -265,8 +265,8 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
     app.get('/sesion/moderador/esperando/:idSesion/:emailInv', function(req, res) {
         var idSesion = decrypt(req.params.idSesion,crypto);
         var emailInv = decrypt(req.params.emailInv,crypto);
-        var idEnc = encrypt(String(sesion.creador), crypto);
-        require('../controllers/guardar_moderador')(req, sesion, idSesion, true);
+        var idEnc = encrypt(String(listaSesiones[idSesion].creador), crypto);
+        require('../controllers/guardar_moderador')(req, listaSesiones[idSesion], idSesion, true);
         //res.redirect('/sesion/esperando/'+req.params.idSesion+'/'+req.params.emailInv);
         res.render('sesion/esperando', {
             username: req.user.username,
@@ -275,7 +275,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             creador: true,
             idSesionEnc: req.params.idSesion,
             emailInvEnc: req.params.emailInv,
-            id: sesion.creador,
+            id: listaSesiones[idSesion].creador,
             idEnc: idEnc
         })
     });
@@ -283,8 +283,8 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
     app.post('/sesion/moderador/esperando/:idSesion/:emailInv', function(req, res) {
         var idSesion = decrypt(req.params.idSesion,crypto);
         var emailInv = decrypt(req.params.emailInv,crypto);
-        var idEnc = encrypt(String(sesion.creador), crypto);
-        require('../controllers/guardar_moderador')(req, sesion, idSesion, false);
+        var idEnc = encrypt(String(listaSesiones[idSesion].creador), crypto);
+        //require('../controllers/guardar_moderador')(req, listaSesiones[idSesion], idSesion, false);
         //res.redirect('/sesion/esperando/'+req.params.idSesion+'/'+req.params.emailInv);
         res.render('sesion/esperando', {
             username: req.body.username,
@@ -293,7 +293,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             creador: true,
             idSesionEnc: req.params.idSesion,
             emailInvEnc: req.params.emailInv,
-            id: sesion.creador,
+            id: listaSesiones[idSesion].creador,
             idEnc: idEnc
         })
     });
@@ -302,7 +302,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         var idSesion = decrypt(req.params.idSesion,crypto);
         var emailInv = decrypt(req.params.emailInv,crypto);
         var idEnc = encrypt(String(req.user.id), crypto);
-        require('../controllers/guardar_registrado')(idSesion, req);
+        //require('../controllers/guardar_registrado')(idSesion, req);
         //res.redirect('/sesion/esperando/'+req.params.idSesion+'/'+req.params.emailInv);
         res.render('sesion/esperando', {
             username: req.user.username,

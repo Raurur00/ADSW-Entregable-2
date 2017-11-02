@@ -109,7 +109,8 @@ models.sequelize.sync().then(function () {
             require('./controllers/timer')(data.hora,data.minuto,data.segundo,io, timer2);
         });
         socket.on('conectado', function(data) {
-            sesion.conectados.push(data.username);
+            var idSesion = data.idSesion;
+            listaSesiones[idSesion].conectados.push(data.username);
         });
     });
 });

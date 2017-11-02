@@ -7,17 +7,17 @@ var message = document.getElementById('message'),
 socket.emit('conectado', {
     username: handle.value,
     email: document.getElementById('email'),
-    idSesion:  document.getElementById('idSesion'),
+    idSesion: document.getElementById('idSesion').value,
 });
 
-//Enviar mensaje
+//Enviar mensaje al hacer click
 btn.addEventListener('click',function () {
     if (message.value.length > 0 & handle.value.length > 0 & message.value != " " & handle.value != " ") {
         socket.emit('chat', {
             message: message.value,
             handle: handle.value
         });
-        message.value = " ";
+        message.value = "";
     }
 });
 
@@ -25,7 +25,7 @@ btn.addEventListener('click',function () {
 
 //Listen for events
 socket.on('chat',function (data) {
-    output.innerHTML += '<p><strong>'+ data.handle +':</strong>'+data.message+'</p>';
+    output.innerHTML += '<p><strong>'+ data.handle + ': </strong>'+data.message+'</p>';
 });
 
 //enviar mensaje al presionar enter y borrarlo después
@@ -36,8 +36,7 @@ function myFunction(event) {
             message: message.value,
             handle: handle.value
         });
-        message.value = " ";
+        message.value = "";
     }
 }
-
 

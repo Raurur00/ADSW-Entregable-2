@@ -254,13 +254,12 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             creador: true
         });
     });
-
-
-    app.get('/sesion/username/:idSesion/:emailInv', function (req, res){
-        var idSesion = decrypt(req.params.idSesion,crypto);
+    
+    app.get('/sesion/username/:idSesionEnc/:emailInvEnc', function (req, res){
+        var idSesion = decrypt(req.params.idSesionEnc,crypto);
+        var emailInv = decrypt(req.params.emailInvEnc,crypto);
         listaSesiones[idSesion].url = '/sesion/esperando/'+req.params.idSesion+ '/' + req.params.emailInv;
         listaSesiones[idSesion].activada = true;
-        var emailInv = decrypt(req.params.emailInv,crypto);
         res.render('sesion/username', {
                 idSesion: idSesion,
                 emailInv: emailInv,

@@ -108,8 +108,12 @@ models.sequelize.sync().then(function () {
         socket.on('iniciar', function (data) {
             require('./controllers/timer')(data.hora,data.minuto,data.segundo,io, timer2);
         });
+        socket.on('start', function (data) {
+            io.sockets.emit('start', data);
+        });
         socket.on('conectado', function(data) {
-            sesion.conectados.push(data.username);
+            var idSesion = data.idSesion;
+            listaSesiones[idSesion].conectados.push(data.username);
         });
     });
 });

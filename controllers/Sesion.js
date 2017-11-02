@@ -5,12 +5,15 @@ module.exports=function(titulo,descrip,moderador) {
     this.moderador=moderador;
     this.activada= false;
     this.invitados= [];
+    this.participantes=[];
     this.escenarios= [];
     this.id= null;
     this.creador=false;
     this.url= '/';
     this.username= false;
     this.conectados= [];
+    this.inicio = false;
+    this.IdxEscActual = 0;
 
     this.crearSesion=function (resolve) {
         models.Sesion.create({

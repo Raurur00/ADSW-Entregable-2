@@ -1,8 +1,5 @@
 <script src="/socket.io/socket.io.js"></script>
 <div id="counter"></div>
-
-{{hor}}, {{mi}}, {{se}}, {{n}}
-
 Escenario: {{esc.objetivo}}<br>
 <body onload="mueveReloj({{hor}}, {{mi}}, {{se}})">
 <center><big><big><big><b>
@@ -26,6 +23,7 @@ Escenario: {{esc.objetivo}}<br>
         <td>{{decision.mecanismo}}</td>
         <td>{{decision.resultado}}</td></tbody>
         <input type="hidden" name="id[]" value="{{decision.id}}">
+        <input type="hidden" name="name[]" value="{{decision.nombre}}">
     {{/each}}
 </table>
 

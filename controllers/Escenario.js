@@ -4,6 +4,7 @@ module.exports = function Escenario(objetivo,hh,mm,ss,sesionID){
     this.hh=hh;
     this.mm=mm;
     this.ss=ss;
+    this.cont = 0;
     this.sesionID=sesionID;
     this.id=null;
 

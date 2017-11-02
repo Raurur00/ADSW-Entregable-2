@@ -12,6 +12,7 @@ module.exports=function(titulo,descrip,moderador) {
     this.url= '/';
     this.username= false;
     this.conectados= [];
+    this.inicio = false;
 
     this.crearSesion=function (resolve) {
         models.Sesion.create({

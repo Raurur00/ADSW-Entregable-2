@@ -235,7 +235,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
     app.get('/sesion/moderador/username/:idSesionEnc/:emailInvEnc', function (req, res){
         var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
         var emailInv = decrypt(req.params.emailInvEnc,crypto);
-        listaSesiones[idSesion].url = '/sesion/moderador/esperandod/'+req.params.idSesion+ '/'+req.params.emailInv;
+        listaSesiones[idSesion].url = '/sesion/moderador/esperando/'+req.params.idSesion+ '/'+req.params.emailInv;
         listaSesiones.activada = true;
         res.render('sesion/username', {
             idSesion: idSesion,
@@ -248,10 +248,10 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
 
 
     app.get('/sesion/username/:idSesion/:emailInv', function (req, res){
-        var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
-        var emailInv = decrypt(req.params.emailInvEnc,crypto);
+        var idSesion = decrypt(req.params.idSesion,crypto);
         listaSesiones[idSesion].url = '/sesion/esperando/'+req.params.idSesion+ '/' + req.params.emailInv;
-        listaSesiones.activada = true;
+        listaSesiones[idSesion].activada = true;
+        var emailInv = decrypt(req.params.emailInv,crypto);
         res.render('sesion/username', {
                 idSesion: idSesion,
                 emailInv: emailInv,
@@ -268,7 +268,6 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         var idEnc = encrypt(String(sesion.creador), crypto);
         require('../controllers/guardar_moderador')(req, sesion, idSesion, true);
         /////////// implementando solo para no egistrado /////////////////////7
-
         res.render('sesion/esperando', {
             username: req.user.username,
             emailInv: emailInv,
@@ -276,7 +275,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             creador: true,
             idSesionEnc: req.params.idSesion,
             emailInvEnc: req.params.emailInv,
-            id: sesion.creador,
+            id: listaSesiones[idSesion].creador,
             idEnc: idEnc
         })
     });
@@ -293,7 +292,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             creador: true,
             idSesionEnc: req.params.idSesion,
             emailInvEnc: req.params.emailInv,
-            id: sesion.creador,
+            id: listaSesiones[idSesion].creador,
             idEnc: idEnc
         })
     });
@@ -302,7 +301,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         var idSesion = decrypt(req.params.idSesion,crypto);
         var emailInv = decrypt(req.params.emailInv,crypto);
         var idEnc = encrypt(String(req.user.id), crypto);
-        require('../controllers/guardar_registrado')(idSesion, req);
+        //require('../controllers/guardar_registrado')(idSesion, req);
         //res.redirect('/sesion/esperando/'+req.params.idSesion+'/'+req.params.emailInv);
         res.render('sesion/esperando', {
             username: req.user.username,

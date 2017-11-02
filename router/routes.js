@@ -330,7 +330,8 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
             idSesionEnc: req.params.idSesion,
             emailInvEnc: req.params.emailInv,
             id: id,
-            idEnc: idEnc
+            idEnc: idEnc,
+            inicio: listaSesiones[idSesion].inicio
         })
     });
 
@@ -417,8 +418,12 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
     ////////////////////////// ESCENARIOS //////////////////////////////////
     app.post('/sesion/iniciar/:idSesion/:id', function(req, res) {
         timer2.cont ++;
+
         var idSesion = decrypt(req.params.idSesion,crypto);
         var id = decrypt(req.params.id,crypto);
+
+        listaSesiones[idSesion].inicio = true;
+
         //require('../controllers/iniciar')(idSesion, id)
         models.Sesion_esc.findAll({
             where: {
@@ -442,10 +447,10 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
                         dec: decision,
                         index: 0,
                         esc: esc[0].dataValues,
-                        hor: timer2.hr,
-                        mi: timer2.min,
-                        se: timer2.seg,
-                        n: timer2.cont
+                        hor: (listaSesiones[idSesion].escenarios)[listaSesiones[idSesion].IdxEscActual].hh,
+                        mi: (listaSesiones[idSesion].escenarios)[listaSesiones[idSesion].IdxEscActual].mm,
+                        se: (listaSesiones[idSesion].escenarios)[listaSesiones[idSesion].IdxEscActual].ss,
+                        n: (listaSesiones[idSesion].escenarios)[listaSesiones[idSesion].IdxEscActual].cont
                     });
 
                 });

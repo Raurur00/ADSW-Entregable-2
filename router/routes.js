@@ -248,11 +248,12 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
     });
 
 
-    app.get('/sesion/username/:idSesion/:emailInv', function (req, res){
-        sesion.url = '/sesion/esperando/'+req.params.idSesion+ '/' + req.params.emailInv;
-        sesion.activada = true;
-        var idSesion = decrypt(req.params.idSesion,crypto);
-        var emailInv = decrypt(req.params.emailInv,crypto);
+    app.get('/sesion/username/:idSesionEnc/:emailInvEnc', function (req, res){
+        var idSesion = decrypt(req.params.idSesionEnc,crypto);
+        var emailInv = decrypt(req.params.emailInvEnc,crypto);
+        listaSesiones[idSesion].url = '/sesion/esperando/'+req.params.idSesion+ '/' + req.params.emailInv;
+        listaSesiones[idSesion].activada = true;
+
         res.render('sesion/username', {
                 idSesion: idSesion,
                 emailInv: emailInv,

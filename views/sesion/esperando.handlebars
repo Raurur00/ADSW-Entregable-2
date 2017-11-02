@@ -22,7 +22,7 @@
 <script src="/js/cliente.js"></script>
 
 {{#if creador}}
-    <form method="post" action="/sesion/iniciar/{{{idSesionEnc}}}/{{{idEnc}}}">
+    <form method="post" action="/sesion/escenario/{{{idSesionEnc}}}/{{{idEscEnc}}}/{{{idPartEnc}}}">
         <input type="hidden" id="iniciar" value="{{{idSesion}}}">
         <input type="hidden" id="handle" value="{{{username}}}">
         <button type="submit" id = "iniciar_sesion" class="btn btn-lg btn-info">iniciar sesión</button>
@@ -32,7 +32,7 @@
 {{/if}}
 
 {{#if inicio}}
-    <form method="post" name ="inicio" action="/sesion/iniciar/{{{idSesionEnc}}}/{{{idEnc}}}">
+    <form method="post" name ="inicio" action="/sesion/escenario/{{{idSesionEnc}}}/{{{idEscEnc}}}/{{{idPartEnc}}}">
 
         <input type="hidden" id="iniciar" value="{{{idSesion}}}">
         <input type="hidden" id="handle" value="{{{username}}}">

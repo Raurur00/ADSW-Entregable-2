@@ -19,7 +19,6 @@ module.exports  = function mueveReloj (hor, minut, segund,io, timer2) {
         hour = "0" + hour;
 
     var horaImprimible = hour + " : " + minute + " : " + second;
-    console.log(horaImprimible);
 
     io.sockets.emit('timer', { countdown: horaImprimible });
     if (second == 0 & minute == 0 & hour == 0) {}

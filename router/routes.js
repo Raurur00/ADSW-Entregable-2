@@ -4,6 +4,7 @@
 var Sesion = require('../controllers/Sesion');
 var Escenario = require('../controllers/Escenario');
 var Invitado = require('../controllers/Invitado');
+var Participante = require('../controllers/Participante')
 var models  = require('../models');
 var decrypt = require('../controllers/decrypt');
 var encrypt = require('../controllers/encrypt');
@@ -11,6 +12,12 @@ var encrypt = require('../controllers/encrypt');
 module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesiones) {
 
     app.get('/', function (req, res) {
+        if (req.isAuthenticated()) {
+            console.log("LOGIIIIIIIIIIIIIIIIIIIIIIIIIIN!");
+            console.log(req.user.password);
+            console.log(req.user.email);
+            console.log(req.user.username);
+        }
         res.render('index');
     });
     //////////////////////////LOGIN///////////////////////////////////////
@@ -116,6 +123,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         });
     });
 
+    /////////////// añadiendo escenarios ///////////////
     app.post('/crear_sesion/esc/:idSesionEnc', function(req, res) {
         req.checkBody('esc', 'escribe un objetivo').notEmpty();
         req.checkBody('hh', 'la hora debe ser un número entero').isInt();
@@ -181,6 +189,7 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         }
     });
 
+    /////////////enviar invitaciones//////////////
     app.post('/crear_sesion/:idSesionEnc', function(req, res) {
         var idSesion = decrypt(String(req.params.idSesionEnc),crypto);
         if (listaSesiones[idSesion].invitados.length == 0 && listaSesiones[idSesion].escenarios.length == 0) {
@@ -266,35 +275,63 @@ module.exports = function(app, passport, nodemailer, crypto, timer2, listaSesion
         var idSesion = decrypt(req.params.idSesion,crypto);
         var emailInv = decrypt(req.params.emailInv,crypto);
         var idEnc = encrypt(String(sesion.creador), crypto);
-        require('../controllers/guardar_moderador')(req, sesion, idSesion, true);
-        /////////// implementando solo para no egistrado /////////////////////7
-        res.render('sesion/esperando', {
-            username: req.user.username,
-            emailInv: emailInv,
-            idSesion: idSesion,
-            creador: true,
-            idSesionEnc: req.params.idSesion,
-            emailInvEnc: req.params.emailInv,
-            id: listaSesiones[idSesion].creador,
-            idEnc: idEnc
-        })
+        if (req.isAuthenticated()) {
+            //hacer algo T_T
+        } else {
+            new Promise(function(resolve,reject){
+                part = new Participante(null, req.body.username , null, false);
+                part.crearParticipante(resolve);
+            }).then(function(data){
+                part.id = data;
+                part.crearSesionUser(idSesion);
+                part.guardarModerador(idSesion);
+                listaSesiones[sesion.id].participantes.push(part);
+                console.log(part);
+                res.render('sesion/esperando', {
+                    username: part.username,
+                    emailInv: part.email,
+                    idSesion: idSesion,
+                    creador: true,
+                    idSesionEnc: req.params.idSesion,
+                    emailInvEnc: req.params.emailInv,
+                    id: listaSesiones[idSesion].creador,
+                    idEnc: idEnc
+                });
+            });
+        }
+        //require('../controllers/guardar_moderador')(req, sesion, idSesion, true);
+
     });
 
     app.post('/sesion/moderador/esperando/:idSesion/:emailInv', function(req, res) {
         var idSesion = decrypt(req.params.idSesion,crypto);
         var emailInv = decrypt(req.params.emailInv,crypto);
         var idEnc = encrypt(String(sesion.creador), crypto);
-        require('../controllers/guardar_moderador')(req, sesion, idSesion, false);
-        res.render('sesion/esperando', {
-            username: req.body.username,
-            emailInv: emailInv,
-            idSesion: idSesion,
-            creador: true,
-            idSesionEnc: req.params.idSesion,
-            emailInvEnc: req.params.emailInv,
-            id: listaSesiones[idSesion].creador,
-            idEnc: idEnc
-        })
+        //require('../controllers/guardar_moderador')(req, sesion, idSesion, false);
+        if (req.isAuthenticated()) {
+            //hacer algo T_T
+        } else {
+            new Promise(function(resolve,reject){
+                part = new Participante(null, req.body.username , null, false);
+                part.crearParticipante(resolve);
+            }).then(function(data){
+                part.id = data;
+                part.crearSesionUser(idSesion);
+                part.guardarModerador(idSesion);
+                listaSesiones[sesion.id].participantes.push(part);
+                console.log(part);
+                res.render('sesion/esperando', {
+                    username: part.username,
+                    emailInv: part.email,
+                    idSesion: idSesion,
+                    creador: true,
+                    idSesionEnc: req.params.idSesion,
+                    emailInvEnc: req.params.emailInv,
+                    id: listaSesiones[idSesion].creador,
+                    idEnc: idEnc
+                });
+            });
+        }
     });
 
     app.get('/sesion/part/esperando/:idSesion/:emailInv', function(req, res) {

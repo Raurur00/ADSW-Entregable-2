@@ -13,6 +13,7 @@ module.exports=function(titulo,descrip,moderador) {
     this.username= false;
     this.conectados= [];
     this.inicio = false;
+    this.IdxEscActual = 0;
 
     this.crearSesion=function (resolve) {
         models.Sesion.create({

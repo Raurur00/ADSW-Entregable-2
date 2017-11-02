@@ -27,8 +27,18 @@
         <input type="hidden" id="handle" value="{{{username}}}">
         <button type="submit" id = "iniciar_sesion" class="btn btn-lg btn-info">iniciar sesión</button>
     </form>
+    <script src="/js/start.js"></script>
     <script src="/js/moderador.js"></script>
 {{/if}}
 
+{{#if inicio}}
+    <form method="post" name ="inicio" action="/sesion/iniciar/{{{idSesionEnc}}}/{{{idEnc}}}">
+
+        <input type="hidden" id="iniciar" value="{{{idSesion}}}">
+        <input type="hidden" id="handle" value="{{{username}}}">
+        <input type="hidden" id="emailInv" value="{{{emailInv}}}">
+        <body onload = "document.inicio.submit();"></body>
+    </form>
+{{/if}}
 
 

@@ -4,15 +4,14 @@
     <title>I.T. Force</title>
     <link rel="stylesheet" href="/css/bootstrap.css" />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/decisiones.css" />
 </head>
 <body>
     <div class="container">
         <div class="header clearfix">
             <nav>
                 <ul class="nav nav-pills pull-right">
-                    {{#if sesion.activada}}
-                        <li role="presentation"><a href="/">Cancelar</a></li>
-                    {{else if user}}
+                    {{#if user}}
                         <li role="presentation"><a href="/">home</a></li>
                         <li role="presentation"><a href="/profile">profile</a></li>
                         <li role="presentation"><a href="/logout">logout</a></li>
@@ -46,7 +45,12 @@
 
         <footer class="footer">
             <p>&copy; 2017 I.T. FORCE, Inc.</p>
-            {{sesion.estado}}
+            {{#each logueados}}
+                Key: {{@key}}
+                {{#each this}}
+                    Key: {{@key}} value: {{this}}<br>
+                {{/each}}
+            {{/each}}
         </footer>
 
     </div> <!-- /container -->

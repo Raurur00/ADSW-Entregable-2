@@ -13,12 +13,17 @@ var expressValidator = require('express-validator');
 var nodemailer = require("nodemailer");
 var crypto = require('crypto');
 var listaSesiones={};
-var timer2 = {
-    hr: 0,
-    min: 1,
-    seg: 0,
-    cont: 0
-}
+var listaDecisiones=null;
+var logueados = {};
+var resultado_por_escenario = {};
+var resultado_final = [];
+var bool_result_final = [-1,false, false, true]; /*[0] index del grafico por escenario
+                                             [1] cargar a la pagina de result final,
+                                             [2] que los part puedan ir a result final
+                                             [3] que no se vuelvan a cargar resultados al
+                                              recargar la pagina
+                                              [4] juntar los graficos*/
+
 
 // Init App
 var app = express();
@@ -87,9 +92,16 @@ app.use(nodeadmin(app));
 
 
 //Routes
-require('./router/routes.js')(app, passport, nodemailer, crypto, timer2,listaSesiones); // load our routes and pass in our app and fully configured passport
-require('./config/passport')(passport); // pass passport for configuration
+require('./router/routes.js')(app, passport, nodemailer, crypto, listaSesiones,listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final); // load our routes and pass in our app and fully configured passport
+require('./config/passport')(passport, logueados); // pass passport for configuration
 app.use('/api', require('./router/api'));
+
+app.locals = {
+    olakease: "olakease",
+    logueados: logueados,
+    listaSesiones: listaSesiones,
+    listaDecisiones: listaDecisiones
+}
 
 //Start Server
 models.sequelize.sync().then(function () {
@@ -106,10 +118,26 @@ models.sequelize.sync().then(function () {
             io.sockets.emit('chat', data);
         });
         socket.on('iniciar', function (data) {
-            require('./controllers/timer')(data.hora,data.minuto,data.segundo,io, timer2);
+            require('./controllers/timer')(listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].hh,
+                listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].mm,
+                listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].ss,
+                data.idSesion, data.indexEsc, listaSesiones, io);
         });
         socket.on('start', function (data) {
             io.sockets.emit('start', data);
+        });
+        socket.on('resultFinal', function (data) {
+            bool_result_final[2] = true;
+            io.sockets.emit('resultFinal', data);
+        });
+        socket.on('resultado', function (data) { //agregar los part que ya mandaron sus decisiones
+
+            listaSesiones[data.idSesion].escenarios[data.indexEsc].revisados.push(listaSesiones[data.idSesion].participantes[data.namePart].username);
+            data.namePart = listaSesiones[data.idSesion].participantes[data.namePart].username;
+            io.sockets.emit('resultado', data);
+        });
+        socket.on('ver_result', function (data) {
+            io.sockets.emit('ver_result', data);
         });
         socket.on('conectado', function(data) {
             var idSesion = data.idSesion;

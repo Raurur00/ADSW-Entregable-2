@@ -12,13 +12,13 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : 'mariobros1'
+    password : 'Mariobros1!'
 });
 
 connection.query('USE proyecto');
 
 // expose this function to our app using module.exports
-module.exports = function(passport) {
+module.exports = function(passport, logueados) {
 
     // =========================================================================
     // passport session setup ==================================================
@@ -78,6 +78,8 @@ module.exports = function(passport) {
                         console.log(result);
                         req.flash('success_msg', 'all t h i c c');
                         newUserMysql.id = result.id;
+                        logueados[result.id] = {email: newUserMysql.email, username: req.body.username,
+                            password: newUserMysql.password, enSesion: false, idSesion: 0};
                         return done(null, newUserMysql);
                     });
                 }
@@ -111,8 +113,10 @@ module.exports = function(passport) {
 
                 // all is well, return successful user
                 req.flash('success_msg', 'all t h i c c');
+                console.log("djskljdklsa ", rows[0]);
+                logueados[rows[0].id] = {email: rows[0].email, username: rows[0].username,
+                    password: rows[0].password, enSesion: false, idSesion: 0};
                 return done(null, rows[0]);
-
             });
         }));
 };

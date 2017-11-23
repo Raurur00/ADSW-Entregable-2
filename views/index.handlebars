@@ -1,19 +1,30 @@
 <div class="row">
-        {{#if error}}
-            <h1>{{error}}</h1>
-        {{/if}}
-        <div class="col-md-6 col-md-offset-3">
-            <form method="post" action="/inicializar_sesion">
-                <div class="form-group">
-                    <label>título</label>
+{{#if errors}}
+    {{#each errors}}
+            <div class="alert alert-danger">{{msg}}</div>
+    {{/each}}
+{{/if}}
+    <div class="col-md-6 col-md-offset-3">
+        <form method="post" action="/inicializar_sesion">
+            <div class="form-group">
+                <label>título</label>
+                {{#if titulo}}
+                    <input type="text" class="form-control" value="{{{titulo}}}" name="titulo">
+                {{else}}
                     <input type="text" class="form-control" placeholder="escribe un titulo aquí" name="titulo">
-                </div>
-                <div class="form-group">
-                    <label>descripción</label>
+                {{/if}}
+            </div>
+            <div class="form-group">
+                <label>descripción</label>
+                {{#if descrip}}
+                    <input type="text" class="form-control" value="{{{descrip}}}" name="descrip">
+                {{else}}
                     <input type="text" class="form-control" placeholder="escribe la descripcion aquí" name="descrip">
-                </div>
-                <button type="submit" class="btn btn-default">crear juego</button>
-            </form>
-        </div>
+                {{/if}}
+
+            </div>
+            <button type="submit" class="btn btn-default">crear juego</button>
+        </form>
+    </div>
 
 </div>

@@ -1,11 +1,17 @@
 <script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/js/dragAndDrop.js"></script>
 <div id="counter"></div>
-Escenario: {{esc.objetivo}}<br>
-<body onload="mueveReloj({{hor}}, {{mi}}, {{se}})">
-<center><big><big><big><b>
-</b></big></big></big></center>
-</body>
 
+Escenario: {{esc.objetivo}}<br>
+Index: {{indexEsc}}<br>
+
+<script>
+    var votos = [];
+    var olakease = 2;
+</script>
+
+holaaaaaaa {{{username}}}
+<form method="post" action="/sesion/escenario/mandar_decisiones/{{{idSesionEnc}}}/{{{indexEsc}}}/{{{idPartEnc}}}/{{{username}}}">
 <table class="table">
     <thead>
     <tr>
@@ -15,35 +21,70 @@ Escenario: {{esc.objetivo}}<br>
         <th> Resultado </th>
     </tr>
     </thead>
-    <tbody>
-<form method="post" action="/mandar_decisiones">
     {{#each dec as |decision|}}
+        <tbody>
         <td><input type="checkbox" class="checks" name = "lang[]" value = {{decision.id}}></td><br>
         <td>{{decision.nombre}}</td>
         <td>{{decision.mecanismo}}</td>
-        <td>{{decision.resultado}}</td></tbody>
-        <input type="hidden" name="id[]" value="{{decision.id}}">
-        <input type="hidden" name="name[]" value="{{decision.nombre}}">
+        <td>{{decision.resultado}}</td>
+        </tbody>
     {{/each}}
+
 </table>
 
-
-<button type="submit" class="btn btn-default"> Enviar</button>
-
-
+<button type="submit" id = "resultado" class="btn btn-default"> Enviar</button>
 </form>
-</tbody>
+
+<form id="hola" method="post" action="/sesion/escenario/mandar_decisiones/{{{idSesionEnc}}}/{{{indexEsc}}}/{{{idPartEnc}}}/{{{username}}}">
+    <div id="dragzone" class="dragzone"
+         ondrop="DROP.drop(event, votos)" ondragover="DROP.allowDrop(event)"
+         ondragenter="DROP.handleDragEnter(event)"
+         ondragleave="DROP.handleDragLeave(event)"></div>
+    <br>
+    <div class="scroll"
+         ondrop="DROP.drop(event, votos)" ondragover="DROP.allowDrop(event)"
+         ondragenter="DROP.handleDragEnter(event)"
+         ondragleave="DROP.handleDragLeave(event)">
+        {{#each dec as |decision|}}
+            <div id='{{decision.id}}' class="tarjeta" draggable="true" ondragstart="DROP.drag(event)">
+                <h2>{{decision.nombre}}</h2>
+                <h4>{{decision.mecanismo}}</h4>
+                <p>{{decision.resultado}}</p>
+            </div>
+        {{/each}}
+    </div>
+    <button class="btn btn-default" type="submit" name = "votos[]"  value = > Enviar </button>
+</form>
 
 <script> var socket = io.connect(window.location.host);
 
 var counter = document.getElementById('counter');
+    resultado = document.getElementById('resultado');
+
 console.log('iniciando timer..');
 socket.emit('iniciar',{
     hora: {{hor}},
     minuto: {{mi}},
-    segundo: {{se}}
+    segundo: {{se}},
+    indexEsc: {{indexEsc}},
+    idSesion: {{idSesion}}
 });
 
+//Enviar mensaje al hacer click
+resultado.addEventListener('click',function () {
+    if ({{nocreador}}) {
+        socket.emit('resultado', {
+            idPart: {{idPart}},
+            indexEsc: {{indexEsc}},
+            idSesion: {{idSesion}},
+            namePart: {{namePart}}
+        });
+    }
+
+});
+
+socket.on('resultado',function (data) {
+});
 
 socket.on('timer',function (data) {
     counter.innerHTML = data.countdown;

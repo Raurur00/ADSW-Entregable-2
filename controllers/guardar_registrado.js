@@ -1,4 +1,4 @@
-    var models  = require('../models');
+var models  = require('../models');
 var mysql = require('mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',

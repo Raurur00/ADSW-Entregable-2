@@ -1,13 +1,4 @@
 var models  = require('../models');
-var mysql = require('mysql');
-var connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : 'mariobros1'
-});
-
-connection.query('USE proyecto');
-
 module.exports = function(req, sesion, idSesion, registrado) {
     if (registrado) {
         sesion.creador = req.user.id;

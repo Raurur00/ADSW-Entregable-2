@@ -1,8 +1,6 @@
-module.exports  = function mueveReloj (hor, minut, segund,io, timer2) {
-    if (timer2.cont > 1) {
-        timer2.cont --;
-        return;
-    }
+module.exports  = function mueveReloj (hor, minut, segund, idSesion, indexEsc, listaSesiones, io) {
+    indexEsc2 = listaSesiones[idSesion].IdxEscActual;
+    if (indexEsc != indexEsc2) return;
     var hour = hor;
     var minute = minut;
     var second = segund;
@@ -34,10 +32,11 @@ module.exports  = function mueveReloj (hor, minut, segund,io, timer2) {
         minute -= 1;
         second = 59;
     }
-    timer2.hr = hour;
-    timer2.min = minute;
-    timer2.seg = second;
+    listaSesiones[idSesion].escenarios[indexEsc2].hh = hour;
+    listaSesiones[idSesion].escenarios[indexEsc2].mm = minute;
+    listaSesiones[idSesion].escenarios[indexEsc2].ss = second;
     setTimeout(function(){
-        mueveReloj(hour, minute, second,io, timer2)
+        mueveReloj(hour, minute, second,
+            idSesion, indexEsc, listaSesiones, io)
     },1000)
 }

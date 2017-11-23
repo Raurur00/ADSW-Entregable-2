@@ -1,0 +1,43 @@
+
+div.scroll{
+    width: 700px;
+    height: 320px;
+    overflow:scroll;
+    white-space:nowrap;
+    background: grey;
+}
+div.tarjeta{
+    white-space:normal;
+    display: inline-block;
+    width: 225px;
+    height: 300px;
+    border:1px solid;
+    cursor:move;
+    vertical-align: top;
+    margin: 4px;
+    background: white;
+}
+div.tarjeta h2{
+    display: block;
+    text-align:justify;
+    margin: 5px;
+}
+div.tarjeta h4{
+    margin: 5px;
+    text-align:justify;
+}
+div.tarjeta p {
+    margin: 5px;
+    text-align:justify;
+}
+
+div.dragzone{
+    width: 700px;
+    height: 320px;
+    overflow:scroll;
+    white-space:nowrap;
+    background: #DCDCDC;
+}
+div.over{
+    border: 10px dashed #000;
+}

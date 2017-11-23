@@ -7,6 +7,9 @@ module.exports = function Escenario(objetivo,hh,mm,ss,sesionID){
     this.cont = 0;
     this.sesionID=sesionID;
     this.id=null;
+    this.votos = [];
+    this.revisados = [];
+    this.ver_resultado = false;
 
     this.crearEscenario = function(resolve){
         models.Escenario.create({
@@ -29,5 +32,13 @@ module.exports = function Escenario(objetivo,hh,mm,ss,sesionID){
             EscenarioId: this.id,
             SesionId: this.sesionID
         });
-    }
+    };
+
+    this.crearVoto = function(idDecision,idParticipante){
+        models.Voto.create({
+            DecisionId: idDecision,
+            EscenarioId: this.id,
+            ParticipanteId: idParticipante
+        });
+    };
 };

@@ -1,0 +1,21 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+
+<script type="text/javascript" src="/js/grafico.js"></script>
+<script type="text/javascript">
+    var socket = io.connect(window.location.host);
+    socket.on('start',function (data) {
+        document.location.reload(true);
+    });
+</script>
+
+{{#each probando.stringify as |prob|}}
+    <script type="text/javascript">
+        GRAFICO.init({{{prob.stringify}}});
+        GRAFICO.draw();
+    </script>
+{{/each}}

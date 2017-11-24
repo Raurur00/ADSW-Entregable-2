@@ -4,7 +4,6 @@ var result = document.getElementById('mostrar_resultados');
 var idSesion = document.getElementById('iniciar');
 var resultFinal = document.getElementById('resultfinal');
 
-
 //Enviar mensaje al hacer click
 btn.addEventListener('click',function () {
     socket.emit('start', {

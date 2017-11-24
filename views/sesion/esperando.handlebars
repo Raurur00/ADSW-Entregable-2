@@ -16,6 +16,12 @@
 
 </script>
 
+Conectados: <br>
+{{#each names as |c|}}
+    {{c}}
+{{/each}}
+<br>
+
 Index: {{{indexEsc}}}<br>
 {{#if creador}}
     {{#each revisados as |r|}}
@@ -87,5 +93,3 @@ Index: {{{indexEsc}}}<br>
         </form>
     {{/if}}
 {{/if}}
-
-

@@ -327,6 +327,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             part.guardarModerador(idSesion);
             listaSesiones[idSesion].moderador = part.id;
             listaSesiones[idSesion].participantes.push(part);
+            listaSesiones[idSesion].conectados.push(part);
             console.log("estoy en username del mod en get en logueado: ", listaSesiones[idSesion].participantes);
             res.render('sesion/esperando', {
                 noresultado: true,
@@ -362,6 +363,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             part.id = req.user.id;
             part.crearSesionUser(idSesion);
             listaSesiones[idSesion].participantes.push(part);
+            listaSesiones[idSesion].conectados.push(part);
             console.log("estoy en username del part en get en logueado: ", listaSesiones[idSesion].participantes);
             res.render('sesion/esperando', {
                 noresultado: true,
@@ -388,6 +390,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
 
     /////////////////////// PANTALLA DE ESPERA/CHAT ////////////////////////////////////
     app.get('/sesion/mod/iniciando/:idSesion/:emailInv', function (req, res) {
+        var names_conectados = [];
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
         new Promise(function (resolve, reject) {
             part = new Participante(null, req.body.username, null, false);
@@ -398,8 +401,15 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             part.guardarModerador(idSesion);
             listaSesiones[idSesion].moderador = part.id;
             listaSesiones[idSesion].participantes.push(part);
+            listaSesiones[idSesion].conectados.push(part);
+            console.log("CONECTADOS", listaSesiones[idSesion].conectados);
+            for (i = 0; i < listaSesiones[idSesion].conectados.length; i++){
+                console.log(listaSesiones[idSesion].conectados[i].username);
+                names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+            }
             console.log("estoy en iniciando del mod en get sin loguear: ", listaSesiones[idSesion].participantes);
             res.render('sesion/esperando', {
+                names: names_conectados,
                 noresultado: true,
                 username: part.username,
                 emailInv: part.email,
@@ -414,6 +424,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         });
     });
     app.post('/sesion/mod/iniciando/:idSesion/:emailInv', function (req, res) {
+        var names_conectados = [];
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
         new Promise(function (resolve, reject) {
             part = new Participante(null, req.body.username, null, false);
@@ -424,8 +435,14 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             part.guardarModerador(idSesion);
             listaSesiones[idSesion].moderador = part.id;
             listaSesiones[idSesion].participantes.push(part);
+            listaSesiones[idSesion].conectados.push(part);
+            console.log("CONECTADOS2", listaSesiones[idSesion].conectados);
+            for (i = 0; i < listaSesiones[idSesion].conectados.length; i++){
+                names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+            }
             console.log("estoy en iniciando del mod en post sin loguear: ", listaSesiones[idSesion].participantes);
             res.render('sesion/esperando', {
+                names: names_conectados,
                 noresultado: true,
                 username: part.username,
                 emailInv: part.email,
@@ -451,6 +468,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 part.id = data;
                 part.crearSesionUser(idSesion);
                 listaSesiones[sesion.id].participantes.push(part);
+                listaSesiones[sesion.id].conectados.push(part);
                 console.log("estoy en iniciando del part en post sin loguear: ", listaSesiones[idSesion].participantes);
                 res.render('sesion/esperando', {
                     noresultado: true,
@@ -488,6 +506,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         if (parseInt(listaSesiones[idSesion].moderador) === parseInt(idPart)) {
             nocreador = false;
         }
+        console.log("HORAAA",listaSesiones[idSesion].escenarios[req.params.indexEsc].hr_finish);
         var namePart = 0;
         bool_result_final[3] = true;
         for (i = 0; i < listaSesiones[idSesion].participantes.length;i ++){
@@ -500,6 +519,12 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         listaSesiones[idSesion].IdxEscActual = parseInt(req.params.indexEsc);
         listaSesiones[idSesion].inicio = true;
         listaSesiones[idSesion].escenarios.ver_resultado = false;
+        console.log(listaSesiones[idSesion].participantes);
+        console.log("CONECTADOS", listaSesiones[idSesion].conectados);
+        var hr_finish = new Date().getTime();
+        hr_finish += 1000*60*60*listaSesiones[idSesion].escenarios[req.params.indexEsc].hh
+            + 1000*60*listaSesiones[idSesion].escenarios[req.params.indexEsc].mm
+            + 1000*listaSesiones[idSesion].escenarios[req.params.indexEsc].ss;
         models.Decision.findAll().then(function (decision) {
             listaDecisiones=decision;
             res.render('decisiones', {
@@ -514,6 +539,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 hor: listaSesiones[idSesion].escenarios[req.params.indexEsc].hh,
                 mi: listaSesiones[idSesion].escenarios[req.params.indexEsc].mm,
                 se: listaSesiones[idSesion].escenarios[req.params.indexEsc].ss,
+                hr_finish: hr_finish,
                 n: listaSesiones[idSesion].escenarios[req.params.indexEsc].cont,
                 nocreador: nocreador,
                 namePart: namePart
@@ -584,6 +610,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     app.post('/sesion/escenario/resultado/:idSesion/:indexEsc/:idPart/:username', function(req, res){
         var aux = {};
         var contVotos = {};
+        var VotosporPar = {};
         for(i = 0; i < listaDecisiones.length; i++) {
             contVotos[listaDecisiones[i].dataValues.id] = 0;
         }
@@ -603,8 +630,17 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         }
 
         for(i = 0; i < votosEsc.length; i++) {
+            VotosporPar[votosEsc[i].idParticipante] = [];
+        }
+
+        for(i = 0; i < votosEsc.length; i++) {
+            VotosporPar[votosEsc[i].idParticipante].push(votosEsc[i].idDecision);
+        }
+
+        for(i = 0; i < votosEsc.length; i++) {
             contVotos[votosEsc[i].idDecision]++;
         }
+
         if (creador && bool_result_final[3]) {
             for (i = 0; i < votosEsc.length; i++) {
                 bool_result_final[3] = false;
@@ -614,15 +650,43 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         if (parseInt(indexEsc) === parseInt(listaSesiones[idSesion].escenarios.length))
             bool_result_final[1] = true;
         var contFinal = [];
+
         for(key in contVotos){
             contFinal.push({name: key, y: contVotos[key]})
         }
+
         contFinal.stringify = JSON.stringify(contFinal);
         if (resultado_final.length < indexEsc){
             resultado_final.push(contFinal);
         }
+
+        F = [];
+        for (idPart in VotosporPar){
+            aux = [];
+            aux2 = [];
+            for (i = 0; i < listaSesiones[idSesion].participantes.length; i++){
+                if (parseInt(listaSesiones[idSesion].participantes[i].id) == parseInt(idPart)){
+                    aux.push(listaSesiones[idSesion].participantes[i].username);
+                    break;
+                }
+
+            }
+            for (dec = 0; dec < VotosporPar[idPart].length; dec++) {
+                for (i = 0; i < listaDecisiones.length; i++) {
+                    if (parseInt(listaDecisiones[i].id) == parseInt(VotosporPar[idPart][dec])) {
+                        aux2.push(listaDecisiones[i].nombre);
+                        break;
+                    }
+                }
+            }
+            aux.push(aux2);
+
+            F.push(aux);
+        }
+        console.log(F);
         console.log(resultado_final);
         res.render('sesion/resultado_esc', {
+            VotosporPart: F,
             probando: contFinal,
             username: req.params.username,
             idSesionEnc: req.params.idSesion,

@@ -6,6 +6,18 @@ Escenario: {{esc.objetivo}}<br>
 Index: {{indexEsc}}<br>
 
 <script>
+    var now = new Date().getTime();
+    var distance = hr_finish - now;
+
+    // Time calculations for days, hours, minutes and seconds
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Output the result in an element with id="demo"
+    document.getElementById("counter").innerHTML += "\n" +  days + "d " + hours + "h "
+            + minutes + "m " + seconds + "s ";
     var votos = [];
     var olakease = 2;
 </script>
@@ -61,6 +73,46 @@ holaaaaaaa {{{username}}}
 var counter = document.getElementById('counter');
     resultado = document.getElementById('resultado');
 
+var x = setInterval(function() {
+
+    // Get todays date and time
+    var now = new Date().getTime();
+
+    // Find the distance between now an the count down date
+    var distance = {{hr_finish}} - now;
+
+    // Time calculations for days, hours, minutes and seconds
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    var str_segundo = new String (seconds)
+    if (str_segundo.length === 1)
+        seconds = "0" + seconds;
+
+    var str_minuto = new String (minutes)
+    if (str_minuto.length === 1)
+        minutes = "0" + minutes;
+
+    var str_hora = new String (hours)
+    if (str_hora.length === 1)
+        hours = "0" + hours;
+
+    var horaImprimible = hours + " : " + minutes + " : " + seconds;
+
+    // Output the result in an element with id="demo"
+    document.getElementById("counter").innerHTML = horaImprimible;
+
+    // If the count down is over, write some text
+    if (distance < 0) {
+        clearInterval(x);
+        document.getElementById("counter").innerHTML = "SE ACABO DEL TIEMPO";
+    }
+}, 1000);
+
+// Output the result in an element with id="demo"
+
+
 console.log('iniciando timer..');
 socket.emit('iniciar',{
     hora: {{hor}},
@@ -87,7 +139,7 @@ socket.on('resultado',function (data) {
 });
 
 socket.on('timer',function (data) {
-    counter.innerHTML = data.countdown;
+    document.getElementById("counter").innerHTML += "\n" ;
 });
 
 </script>

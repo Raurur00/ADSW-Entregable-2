@@ -112,7 +112,10 @@ models.sequelize.sync().then(function () {
     var io = require('socket.io')(server);
 
     io.on('connection', function (socket) {
-        console.log('Alguien se ha conectado con Sockets',socket.id);
+        socket.on('disconnect', function(data){
+           console.log(socket.id, socket.username, "SE DESCONECTO");
+        });
+        console.log('Alguien se ha conectado con Sockets',socket.id, socket.username);
         socket.on('chat', function (data) {
             io.sockets.emit('chat', data);
         });
@@ -139,8 +142,8 @@ models.sequelize.sync().then(function () {
             io.sockets.emit('ver_result', data);
         });
         socket.on('conectado', function(data) {
+            socket.username = data.username;
             var idSesion = data.idSesion;
-            listaSesiones[idSesion].conectados.push(data.username);
         });
     });
 });

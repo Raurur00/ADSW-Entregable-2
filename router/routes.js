@@ -329,7 +329,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             listaSesiones[idSesion].participantes.push(part);
             listaSesiones[idSesion].conectados.push(part);
             console.log("estoy en username del mod en get en logueado: ", listaSesiones[idSesion].participantes);
-            res.render('sesion/esperando', {
+            res.render('esperando.html', {
                 noresultado: true,
                 username: req.user.username,
                 idSesion: idSesion,
@@ -338,11 +338,12 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 idPart: req.user.id,
                 idPartEnc: encrypt(String(req.user.id), crypto),
                 indexEsc: 0,
-                inicio: listaSesiones[idSesion].inicio
+                inicio: listaSesiones[idSesion].inicio,
+                revisados: []
             });
         } else {
             console.log("estoy en username del mod en get sin loguear: ", listaSesiones[idSesion].participantes);
-            res.render('sesion/username', {
+            res.render('username.html', {
                 idSesion: idSesion,
                 emailInv: emailInv,
                 idSesionEnc: req.params.idSesionEnc,
@@ -365,7 +366,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             listaSesiones[idSesion].participantes.push(part);
             listaSesiones[idSesion].conectados.push(part);
             console.log("estoy en username del part en get en logueado: ", listaSesiones[idSesion].participantes);
-            res.render('sesion/esperando', {
+            res.render('esperando.html', {
                 noresultado: true,
                 username: req.user.username,
                 idSesion: idSesion,
@@ -374,11 +375,12 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 idPart: req.user.id,
                 idPartEnc: encrypt(String(req.user.id), crypto),
                 indexEsc: 0,
-                inicio: listaSesiones[idSesion].inicio
+                inicio: listaSesiones[idSesion].inicio,
+                revisados: []
             });
         } else {
             console.log("estoy en username del part en get sin loguear: ", listaSesiones[idSesion].participantes);
-            res.render('sesion/username', {
+            res.render('username.html', {
                 idSesion: idSesion,
                 emailInv: emailInv,
                 idSesionEnc: req.params.idSesionEnc,
@@ -408,7 +410,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 names_conectados.push(listaSesiones[idSesion].conectados[i].username);
             }
             console.log("estoy en iniciando del mod en get sin loguear: ", listaSesiones[idSesion].participantes);
-            res.render('sesion/esperando', {
+            res.render('esperando.html', {
                 names: names_conectados,
                 noresultado: true,
                 username: part.username,
@@ -419,7 +421,9 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 creador: true,
                 idPart: part.id,
                 idPartEnc: encrypt(String(part.id), crypto),
-                indexEsc: 0
+                indexEsc: 0,
+                inicio: listaSesiones[idSesion].inicio,
+                revisados: []
             });
         });
     });
@@ -441,7 +445,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 names_conectados.push(listaSesiones[idSesion].conectados[i].username);
             }
             console.log("estoy en iniciando del mod en post sin loguear: ", listaSesiones[idSesion].participantes);
-            res.render('sesion/esperando', {
+            res.render('esperando.html', {
                 names: names_conectados,
                 noresultado: true,
                 username: part.username,
@@ -452,7 +456,9 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 creador: true,
                 idPart: part.id,
                 idPartEnc: encrypt(String(part.id), crypto),
-                indexEsc: 0
+                indexEsc: 0,
+                inicio: listaSesiones[idSesion].inicio,
+                revisados: []
             });
         });
     });
@@ -470,7 +476,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 listaSesiones[sesion.id].participantes.push(part);
                 listaSesiones[sesion.id].conectados.push(part);
                 console.log("estoy en iniciando del part en post sin loguear: ", listaSesiones[idSesion].participantes);
-                res.render('sesion/esperando', {
+                res.render('esperando.html', {
                     noresultado: true,
                     username: part.username,
                     idSesion: idSesion,
@@ -479,11 +485,12 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                     idPart: part.id,
                     idPartEnc: encrypt(String(part.id), crypto),
                     indexEsc: 0,
-                    inicio: listaSesiones[idSesion].inicio
+                    inicio: listaSesiones[idSesion].inicio,
+                    revisados: []
                 });
             });
         }   else {
-            res.render('sesion/esperando', {
+            res.render('esperando.html', {
                 noresultado: true,
                 username: req.body.username,
                 idSesion: idSesion,
@@ -492,7 +499,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 idPart: null,
                 idPartEnc: null,
                 indexEsc: 0,
-                inicio: listaSesiones[idSesion].inicio
+                inicio: listaSesiones[idSesion].inicio,
+                revisados: []
             });
         }
     });
@@ -527,7 +535,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             + 1000*listaSesiones[idSesion].escenarios[req.params.indexEsc].ss;
         models.Decision.findAll().then(function (decision) {
             listaDecisiones=decision;
-            res.render('decisiones', {
+            res.render('decisiones.html', {
                 username: req.params.username,
                 idSesion: idSesion,
                 idSesionEnc: req.params.idSesion,
@@ -566,7 +574,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             });
         });
         console.log(escenarioActual.votos);
-        res.render('sesion/mandar_decisiones',
+        res.render('mandarDecisiones.html',
             {
                 username: req.params.username,
                 idSesion: idSesion,
@@ -590,7 +598,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         console.log("REVISADOOOOOOOOOOOOOOS", listaSesiones[idSesion].escenarios[indexEsc].revisados);
         indexEsc = parseInt(indexEsc)+1;
         if (indexEsc <= listaSesiones[idSesion].escenarios.length) {
-            res.render('sesion/esperando', {
+            res.render('esperando.html', {
+                noresultado: false,
                 username: req.params.username,
                 idSesion: idSesion,
                 idSesionEnc: req.params.idSesion,
@@ -685,7 +694,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         }
         console.log(F);
         console.log(resultado_final);
-        res.render('sesion/resultado_esc', {
+        res.render('resultadoEsc.html', {
             VotosporPart: F,
             probando: contFinal,
             username: req.params.username,
@@ -709,7 +718,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             console.log("SOYYYYYYYY POKIIIIIIIIII!");
         }
         resultado_final.stringify = JSON.stringify(resultado_final);
-        res.render('sesion/resultado_final', {
+        res.render('resultadoFinal.html', {
             probando: resultado_final,
             username: req.params.username,
             idSesionEnc: req.params.idSesion,

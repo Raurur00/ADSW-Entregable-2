@@ -8,8 +8,16 @@ var encrypt = require('../controllers/encrypt');
 
 module.exports = function(app, passport, nodemailer, crypto, listaSesiones, listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final) {
 
+    app.get('/probando', function(req, res) {
+        res.render('probando.html');
+    });
+
     app.get('/', function (req, res) {
-        res.render('index');
+        res.render('index.html', {errors: false});
+    });
+
+    app.get('/layout', function(res) {
+        res.render('layout.html');
     });
     //////////////////////////LOGIN///////////////////////////////////////
     app.get('/login', function (req, res) {
@@ -47,11 +55,11 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
 
     /////////////////////////// INICIALIZAR SESION //////////////////////////
     app.post('/inicializar_sesion', function (req, res) {
-        req.checkBody('titulo', 'el titulo es o b l i g a t o r i o').notEmpty();
-        req.checkBody('descrip', 'la descripción es o b l i g a t o r i a').notEmpty();
+        req.checkBody('titulo', 'El título es obligatorio').notEmpty();
+        req.checkBody('descrip', 'La descripción es obligatoria').notEmpty();
         var errors = req.validationErrors();
         if (errors) {
-            res.render('index', {errors: errors, titulo: req.body.titulo, descrip: req.body.descrip});
+            res.render('index.html', {errors: errors, titulo: req.body.titulo, descrip: req.body.descrip});
         } else {
             new Promise(function (resolve, reject) {
                 sesion = new Sesion(req.body.titulo, req.body.descrip, null);
@@ -65,12 +73,23 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     });
     ///////////////////// CREAR SESION ///////////////////////////////////////
     app.get('/crear_sesion/:idSesionEnc', function (req, res) {
-        res.render('sesion/crear_sesion', {
+        res.render('crearSesion.html', {
+            errors: [],
             sesion: listaSesiones[parseInt(decrypt(req.params.idSesionEnc, crypto))],
-            idSesionEnc: req.params.idSesionEnc
+            idSesionEnc: req.params.idSesionEnc,
+            repetido: false,
+            propio: false,
+            notiempo: false,
+            notiempo: false,
+            escrepetido: false,
+            invitados: [],
+            escenarios: [],
+            noinv: false,
+            noesc: false
         });
     });
 
+    //////////// invitados /////////
     app.post('/crear_sesion/invitar/:idSesionEnc', function (req, res) {
         req.checkBody('email', 'Email is required').notEmpty();
         req.checkBody('email', 'Email is not valid').isEmail();
@@ -78,26 +97,41 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var repetido = false;
         var idSesion = parseInt(decrypt(String(req.params.idSesionEnc), crypto));
         listaSesiones[idSesion].invitados.forEach(function (invitado) {
-            if (invitado.toString() === req.body.email.toString()) {
+            if (invitado.email.toString() === req.body.email.toString()) {
                 repetido = true;
                 return;
             }
         });
         if (repetido) {
-            res.render('sesion/crear_sesion', {
+            res.render('crearSesion.html', {
+                errors: errors,
                 sesion: listaSesiones[idSesion],
+                idSesionEnc: req.params.idSesionEnc,
                 repetido: true,
-                idSesionEnc: req.params.idSesionEnc
+                propio: false,
+                notiempo: false,
+                escrepetido: false,
+                invitados: listaSesiones[idSesion].invitados,
+                escenarios: listaSesiones[idSesion].escenarios,
+                noinv: false,
+                noesc: false
             });
             return;
         }
         if (req.user) {
             if (req.user.email.toString() === req.body.email.toString()) {
-                res.render('sesion/crear_sesion', {
+                res.render('crearSesion.html', {
                     errors: errors,
                     sesion: listaSesiones[idSesion],
+                    idSesionEnc: req.params.idSesionEnc,
+                    repetido: false,
                     propio: true,
-                    idSesionEnc: req.params.idSesionEnc
+                    notiempo: false,
+                    escrepetido: false,
+                    invitados: listaSesiones[idSesion].invitados,
+                    escenarios: listaSesiones[idSesion].escenarios,
+                    noinv: false,
+                    noesc: false
                 });
                 return;
             }
@@ -106,10 +140,18 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             invitado = new Invitado(req.body.email);
             listaSesiones[idSesion].invitados.push(invitado);
         }
-        res.render('sesion/crear_sesion', {
+        res.render('crearSesion.html', {
             errors: errors,
             sesion: listaSesiones[idSesion],
-            idSesionEnc: req.params.idSesionEnc
+            idSesionEnc: req.params.idSesionEnc,
+            repetido: false,
+            propio: false,
+            notiempo: false,
+            escrepetido: false,
+            invitados: listaSesiones[idSesion].invitados,
+            escenarios: listaSesiones[idSesion].escenarios,
+            noinv: false,
+            noesc: false
         });
     });
 
@@ -122,11 +164,18 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var errors = req.validationErrors();
         var idSesion = parseInt(decrypt(String(req.params.idSesionEnc), crypto));
         if (!req.body.hh && !req.body.mm && !req.body.ss) {
-            res.render('sesion/crear_sesion', {
+            res.render('crearSesion.html', {
                 errors: errors,
                 sesion: listaSesiones[idSesion],
+                idSesionEnc: req.params.idSesionEnc,
+                repetido: false,
+                propio: false,
                 notiempo: true,
-                idSesionEnc: req.params.idSesionEnc
+                escrepetido: false,
+                invitados: listaSesiones[idSesion].invitados,
+                escenarios: listaSesiones[idSesion].escenarios,
+                noinv: false,
+                noesc: false
             });
             return;
         }
@@ -138,11 +187,18 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             }
         });
         if (repetido) {
-            res.render('sesion/crear_sesion', {
+            res.render('crearSesion.html', {
                 errors: errors,
                 sesion: listaSesiones[idSesion],
+                idSesionEnc: req.params.idSesionEnc,
+                repetido: false,
+                propio: false,
+                notiempo: false,
                 escrepetido: true,
-                idSesionEnc: req.params.idSesionEnc
+                invitados: listaSesiones[idSesion].invitados,
+                escenarios: listaSesiones[idSesion].escenarios,
+                noinv: false,
+                noesc: false
             });
             return;
         }
@@ -154,17 +210,33 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 esc.id = data;
                 esc.crearSesionEsc();
                 listaSesiones[idSesion].escenarios.push(esc);
-                res.render('sesion/crear_sesion', {
-                    errors: errors,
+                res.render('crearSesion.html', {
+                    errors: false,
                     sesion: listaSesiones[idSesion],
-                    idSesionEnc: req.params.idSesionEnc
+                    idSesionEnc: req.params.idSesionEnc,
+                    repetido: false,
+                    propio: false,
+                    notiempo: false,
+                    escrepetido: false,
+                    invitados: listaSesiones[idSesion].invitados,
+                    escenarios: listaSesiones[idSesion].escenarios,
+                    noinv: false,
+                    noesc: false
                 });
             });
         } else {
-            res.render('sesion/crear_sesion', {
+            res.render('crearSesion.html', {
                 errors: errors,
                 sesion: listaSesiones[idSesion],
-                idSesionEnc: req.params.idSesionEnc
+                idSesionEnc: req.params.idSesionEnc,
+                repetido: false,
+                propio: false,
+                notiempo: false,
+                escrepetido: false,
+                invitados: listaSesiones[idSesion].invitados,
+                escenarios: listaSesiones[idSesion].escenarios,
+                noinv: false,
+                noesc: false
             });
         }
     });
@@ -173,27 +245,48 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     app.post('/crear_sesion/:idSesionEnc', function (req, res) {
         var idSesion = parseInt(decrypt(String(req.params.idSesionEnc), crypto));
         if (listaSesiones[idSesion].invitados.length === 0 && listaSesiones[idSesion].escenarios.length === 0) {
-            res.render('sesion/crear_sesion', {
+            res.render('crearSesion.html', {
                 sesion: listaSesiones[idSesion],
                 noinv: true,
                 noesc: true,
-                idSesionEnc: req.params.idSesionEnc
+                idSesionEnc: req.params.idSesionEnc,
+                errors: false,
+                repetido: false,
+                propio: false,
+                notiempo: false,
+                escrepetido: false,
+                invitados: listaSesiones[idSesion].invitados,
+                escenarios: listaSesiones[idSesion].escenarios
             });
             return;
         }
         else if (listaSesiones[idSesion].invitados.length === 0) {
-            res.render('sesion/crear_sesion', {
+            res.render('crearSesion.html', {
                 sesion: listaSesiones[idSesion],
                 noinv: true,
-                idSesionEnc: req.params.idSesionEnc
+                idSesionEnc: req.params.idSesionEnc,
+                errors: false,
+                repetido: false,
+                propio: false,
+                notiempo: false,
+                escrepetido: false,
+                invitados: listaSesiones[idSesion].invitados,
+                escenarios: listaSesiones[idSesion].escenarios
             });
             return;
         }
         else if (listaSesiones[idSesion].escenarios.length === 0) {
-            res.render('sesion/crear_sesion', {
+            res.render('crearSesion.html', {
                 sesion: listaSesiones[idSesion],
                 noesc: true,
-                idSesionEnc: req.params.idSesionEnc
+                idSesionEnc: req.params.idSesionEnc,
+                errors: false,
+                repetido: false,
+                propio: false,
+                notiempo: false,
+                escrepetido: false,
+                invitados: listaSesiones[idSesion].invitados,
+                escenarios: listaSesiones[idSesion].escenarios
             });
             return;
         }

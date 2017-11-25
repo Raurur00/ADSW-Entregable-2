@@ -704,7 +704,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             creador: creador,
             inicio: listaSesiones[idSesion].inicio,
             result_final: bool_result_final[1],
-            result_final_part: bool_result_final[2]
+            result_final_part: bool_result_final[2],
         });
     });
 

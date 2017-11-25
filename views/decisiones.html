@@ -28,7 +28,7 @@
                 </thead>
                 <% dec.forEach(function(decision) { %>
                     <tbody>
-                    <td><input type="checkbox" class="checks" name = "lang[]" value = {{decision.id}}></td><br>
+                    <td><input type="checkbox" class="checks" name = "lang[]" value = "<%= decision.id %>"></td><br>
                     <td><%= decision.nombre %></td>
                     <td><%= decision.mecanismo %></td>
                     <td><%= decision.resultado %></td>

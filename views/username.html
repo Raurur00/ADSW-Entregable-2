@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/public/css/bootstrap.css" />
+    <link rel="stylesheet" href="/public/css/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="/controllers/sesionCtrl.js"></script>
+
+
+</head>
+<%- include("layout.html"); %>
+<body ng-app="sesion" ng-controller="sesionCtrl">
+    <div class="col-md-4 col-md-offset-4">
+        <h2 class="page-header">Coloca tu nombre de invitado.</h2>
+        <% if (creador) {%>
+            <form method="post" action="/sesion/mod/iniciando/<%= idSesionEnc %>/<%= emailInvEnc %>">
+                <div class="form-group">
+                    <label>username</label>
+                    <input type="text" class="form-control" placeholder="Username" name="username">
+                </div>
+                <button type="submit" class="btn btn-default">submit</button>
+            </form>
+        <% } else { %>
+            <form method="post" action="/sesion/part/iniciando/<%= idSesionEnc %>/<%= emailInvEnc %>">
+                <div class="form-group">
+                    <label>username</label>
+                    <input type="text" class="form-control" placeholder="Username" name="username">
+                </div>
+                <button type="submit" class="btn btn-default">Comenzar sesión</button>
+            </form>
+        <% } %>
+    </div>
+</body>
+</html>

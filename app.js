@@ -8,7 +8,6 @@ var flash    = require('connect-flash');
 var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
 var session      = require('express-session');
-var exphbs = require('express-handlebars');
 var expressValidator = require('express-validator');
 var nodemailer = require("nodemailer");
 var crypto = require('crypto');
@@ -28,9 +27,9 @@ var bool_result_final = [-1,false, false, true]; /*[0] index del grafico por esc
 var app = express();
 
 // View Engine
+app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.engine('handlebars', exphbs({defaultLayout:'layout'}));
-app.set('view engine', 'handlebars');
+app.engine('html', require('ejs').renderFile);
 
 //Express
 app.use(bodyParser.urlencoded({extended: true }));
@@ -40,7 +39,7 @@ app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser()); // get information from html forms
 
 // Set Static Folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '')));
 
 
 // required for passport

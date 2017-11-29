@@ -5,8 +5,7 @@
     <link rel="stylesheet" href="/public/css/style.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
     <script src="/controllers/sesionCtrl.js"></script>
-
-
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <%- include("layout.html"); %>
 <body ng-app="sesion" ng-controller="sesionCtrl">
@@ -31,4 +30,17 @@
         <% } %>
     </div>
 </body>
+
+<script>
+    var socket = io.connect(window.location.host);
+    var submits = document.getElementsByName("submit");
+    for (var i = 0; i < submits.length; i++)
+    {
+        submits[i].addEventListener('click',function(){
+            socket.emit('online', {
+                username: document.getElementById('text').value
+            });
+        });
+    }
+</script>
 </html>

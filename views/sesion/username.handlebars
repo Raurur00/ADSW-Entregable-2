@@ -1,0 +1,44 @@
+<script src="/socket.io/socket.io.js"></script>
+<h2 class="page-header">coloca tu nombre de invitado :)</h2>
+{{#if errors}}
+    {{#each errors}}
+        <div class="alert alert-danger">{{msg}}</div>
+    {{/each}}
+{{/if}}
+
+{{#if creador}}
+    <form method="post" action="/sesion/mod/iniciando/{{{idSesionEnc}}}/{{{emailInvEnc}}}">
+        <div class="form-group">
+            <label>username</label>
+            <input id = "text" type="text" class="form-control" placeholder="Username" name="username">
+        </div>
+        <button type="submit" name="submit" class="btn btn-default">submit</button>
+    </form>
+
+{{else}}
+    <form method="post" action="/sesion/part/iniciando/{{{idSesionEnc}}}/{{{emailInvEnc}}}">
+        <div class="form-group">
+            <label>username</label>
+            <input id= "text" type="text" class="form-control" placeholder="Username" name="username">
+        </div>
+        <button type="submit" name="submit" class="btn btn-default">Comenzar sesión</button>
+    </form>
+    
+{{/if}}
+
+<script>
+    var socket = io.connect(window.location.host);
+    var submits = document.getElementsByName("submit");
+    for (var i = 0; i < submits.length; i++)
+    {
+        submits[i].addEventListener('click',function(){
+            socket.emit('online', {
+                username: document.getElementById('text').value
+            });
+        });
+    }
+
+
+
+</script>
+

@@ -298,86 +298,162 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     /////////////////////// PANTALLA DE ESPERA/CHAT ////////////////////////////////////
     app.get('/sesion/mod/iniciando/:idSesion/:emailInv', function (req, res) {
         var names_conectados = [];
+        var moderador_guardado = false;
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
-        new Promise(function (resolve, reject) {
-            part = new Participante(null, req.body.username, null, false);
-            part.crearParticipante(resolve);
-        }).then(function (data) {
-            part.id = data;
-            part.crearSesionUser(idSesion);
-            part.guardarModerador(idSesion);
-            listaSesiones[idSesion].moderador = part.id;
-            listaSesiones[idSesion].participantes.push(part);
-            listaSesiones[idSesion].conectados.push(part);
-            console.log("CONECTADOS", listaSesiones[idSesion].conectados);
-            for (i = 0; i < listaSesiones[idSesion].conectados.length; i++){
-                console.log(listaSesiones[idSesion].conectados[i].username);
+        for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
+            if (listaSesiones[idSesion].conectados[i].username != req.body.username)
                 names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+        }
+        for (j = 0; j < listaSesiones[idSesion].participantes.length; j++){
+            if (listaSesiones[idSesion].participantes[j].id == listaSesiones[idSesion].moderador) {
+                moderador_guardado = true;
+                break;
             }
-            console.log("estoy en iniciando del mod en get sin loguear: ", listaSesiones[idSesion].participantes);
+        }
+        if (!moderador_guardado) {
+            new Promise(function (resolve, reject) {
+                part = new Participante(null, req.body.username, null, false);
+                part.crearParticipante(resolve);
+            }).then(function (data) {
+                part.id = data;
+                part.crearSesionUser(idSesion);
+                part.guardarModerador(idSesion);
+                listaSesiones[idSesion].moderador = part.id;
+                listaSesiones[idSesion].participantes.push(part);
+                listaSesiones[idSesion].conectados.push(part);
+                console.log("CONECTADOS", listaSesiones[idSesion].conectados);
+                console.log("estoy en iniciando del mod en get sin loguear: ", listaSesiones[idSesion].participantes);
+                res.render('sesion/esperando', {
+                    names: names_conectados,
+                    noresultado: true,
+                    username: req.body.username,
+                    emailInv: null,
+                    emailInvEnc: req.params.emailInv,
+                    idSesion: idSesion,
+                    idSesionEnc: req.params.idSesion,
+                    creador: true,
+                    idPart: part.id,
+                    idPartEnc: encrypt(String(part.id), crypto),
+                    indexEsc: 0
+                });
+            });
+        }   else {
             res.render('sesion/esperando', {
                 names: names_conectados,
                 noresultado: true,
-                username: part.username,
-                emailInv: part.email,
+                username: req.body.username,
+                emailInv: null, //part.email
                 emailInvEnc: req.params.emailInv,
                 idSesion: idSesion,
                 idSesionEnc: req.params.idSesion,
                 creador: true,
-                idPart: part.id,
-                idPartEnc: encrypt(String(part.id), crypto),
+                idPart: listaSesiones[idSesion].moderador, //part.id
+                idPartEnc: encrypt(String(listaSesiones[idSesion].moderador), crypto), //encrypt(String(part.id), crypto),
                 indexEsc: 0
             });
-        });
+        }
     });
     app.post('/sesion/mod/iniciando/:idSesion/:emailInv', function (req, res) {
         var names_conectados = [];
+        var moderador_guardado = false;
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
-        new Promise(function (resolve, reject) {
-            part = new Participante(null, req.body.username, null, false);
-            part.crearParticipante(resolve);
-        }).then(function (data) {
-            part.id = data;
-            part.crearSesionUser(idSesion);
-            part.guardarModerador(idSesion);
-            listaSesiones[idSesion].moderador = part.id;
-            listaSesiones[idSesion].participantes.push(part);
-            listaSesiones[idSesion].conectados.push(part);
-            console.log("CONECTADOS2", listaSesiones[idSesion].conectados);
-            for (i = 0; i < listaSesiones[idSesion].conectados.length; i++){
+        for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
+            if (listaSesiones[idSesion].conectados[i].username != req.body.username)
                 names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+        }
+        for (j = 0; j < listaSesiones[idSesion].participantes.length; j++){
+            if (listaSesiones[idSesion].participantes[j].id == listaSesiones[idSesion].moderador) {
+                moderador_guardado = true;
+                break;
             }
-            console.log("estoy en iniciando del mod en post sin loguear: ", listaSesiones[idSesion].participantes);
+        }
+        if (!moderador_guardado) {
+            new Promise(function (resolve, reject) {
+                part = new Participante(null, req.body.username, null, false);
+                part.crearParticipante(resolve);
+            }).then(function (data) {
+                part.id = data;
+                part.crearSesionUser(idSesion);
+                part.guardarModerador(idSesion);
+                listaSesiones[idSesion].moderador = part.id;
+                listaSesiones[idSesion].participantes.push(part);
+                listaSesiones[idSesion].conectados.push(part);
+                console.log("CONECTADOS2", listaSesiones[idSesion].conectados);
+                console.log("estoy en iniciando del mod en post sin loguear: ", listaSesiones[idSesion].participantes);
+                res.render('sesion/esperando', {
+                    names: names_conectados,
+                    noresultado: true,
+                    username: part.username,
+                    emailInv: part.email,
+                    emailInvEnc: req.params.emailInv,
+                    idSesion: idSesion,
+                    idSesionEnc: req.params.idSesion,
+                    creador: true,
+                    idPart: part.id,
+                    idPartEnc: encrypt(String(part.id), crypto),
+                    indexEsc: 0
+                });
+            });
+        }   else {
             res.render('sesion/esperando', {
                 names: names_conectados,
                 noresultado: true,
-                username: part.username,
-                emailInv: part.email,
+                username: req.body.username,
+                emailInv: null, //part.email
                 emailInvEnc: req.params.emailInv,
                 idSesion: idSesion,
                 idSesionEnc: req.params.idSesion,
                 creador: true,
-                idPart: part.id,
-                idPartEnc: encrypt(String(part.id), crypto),
+                idPart: listaSesiones[idSesion].moderador, //part.id
+                idPartEnc: encrypt(String(listaSesiones[idSesion].moderador), crypto), //encrypt(String(part.id), crypto),
                 indexEsc: 0
             });
-        });
+        }
     });
 
     app.post('/sesion/part/iniciando/:idSesion/:emailInv', function (req, res) {
+        var names_conectados = [];
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
         var emailInv = decrypt(req.params.emailInv, crypto);
-        if (listaSesiones[idSesion].inicio){
+        var bool = true;
+        for (i = 0; i < listaSesiones[idSesion].participantes.length; i++){
+            console.log(listaSesiones[idSesion].participantes[i].email,emailInv);
+            if (String(listaSesiones[idSesion].participantes[i].email) == String(emailInv))  {
+                for (j = 0; j < listaSesiones[idSesion].conectados.length; j++){
+                    if (listaSesiones[idSesion].conectados[j].username != listaSesiones[idSesion].participantes[i].username)
+                        names_conectados.push(listaSesiones[idSesion].conectados[j].username);
+                }
+                res.render('sesion/esperando', {
+                    names: names_conectados,
+                    noresultado: true,
+                    username: listaSesiones[idSesion].participantes[i].username,
+                    idSesion: idSesion,
+                    idSesionEnc: req.params.idSesion,
+                    creador: false,
+                    idPart: listaSesiones[idSesion].participantes[i].id,
+                    idPartEnc: encrypt(String(listaSesiones[idSesion].participantes[i].id), crypto),
+                    indexEsc: 0,
+                    inicio: listaSesiones[idSesion].inicio
+                });
+                bool = false;
+                break;
+            }
+        }
+        if (bool) {
             new Promise(function (resolve, reject) {
                 part = new Participante(emailInv, req.body.username, null, false);
                 part.crearParticipante(resolve);
             }).then(function (data) {
                 part.id = data;
                 part.crearSesionUser(idSesion);
+                for (j = 0; j < listaSesiones[idSesion].conectados.length; j++){
+                    names_conectados.push(listaSesiones[idSesion].conectados[j].username);
+                }
                 listaSesiones[sesion.id].participantes.push(part);
                 listaSesiones[sesion.id].conectados.push(part);
-                console.log("estoy en iniciando del part en post sin loguear: ", listaSesiones[idSesion].participantes);
+                console.log("estoy en iniciando del part en post sin loguear: ", listaSesiones[idSesion].participantes.length);
                 res.render('sesion/esperando', {
+                    names: names_conectados,
                     noresultado: true,
                     username: part.username,
                     idSesion: idSesion,
@@ -388,18 +464,6 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                     indexEsc: 0,
                     inicio: listaSesiones[idSesion].inicio
                 });
-            });
-        }   else {
-            res.render('sesion/esperando', {
-                noresultado: true,
-                username: req.body.username,
-                idSesion: idSesion,
-                idSesionEnc: req.params.idSesion,
-                creador: false,
-                idPart: null,
-                idPartEnc: null,
-                indexEsc: 0,
-                inicio: listaSesiones[idSesion].inicio
             });
         }
     });
@@ -489,6 +553,11 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var idSesion = parseInt(decrypt(String(req.params.idSesion), crypto));
         var idPart = parseInt(decrypt(String(req.params.idPart), crypto));
         var indexEsc = parseInt(req.params.indexEsc);
+        var names_conectados = [];
+        for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
+            if (listaSesiones[idSesion].conectados[i].username != req.params.username)
+                names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+        }
         escenarioActual = (listaSesiones[idSesion].escenarios)[indexEsc];
         var creador = false;
         if (parseInt(listaSesiones[idSesion].moderador) === parseInt(idPart)) {
@@ -498,6 +567,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         indexEsc = parseInt(indexEsc)+1;
         if (indexEsc <= listaSesiones[idSesion].escenarios.length) {
             res.render('sesion/esperando', {
+                names: names_conectados,
                 username: req.params.username,
                 idSesion: idSesion,
                 idSesionEnc: req.params.idSesion,

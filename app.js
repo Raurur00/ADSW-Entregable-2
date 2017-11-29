@@ -24,7 +24,6 @@ var bool_result_final = [-1,false, false, true]; /*[0] index del grafico por esc
                                               recargar la pagina
                                               [4] juntar los graficos*/
 
-
 // Init App
 var app = express();
 
@@ -116,7 +115,12 @@ models.sequelize.sync().then(function () {
         socket.on('disconnect', function(data){
            console.log(socket.id, socket.username, "SE DESCONECTO");
         });
+
         console.log('Alguien se ha conectado con Sockets',socket.id, socket.username);
+
+        socket.on('online', function (data) {
+            io.sockets.emit('online', data);
+        });
         socket.on('chat', function (data) {
             io.sockets.emit('chat', data);
         });

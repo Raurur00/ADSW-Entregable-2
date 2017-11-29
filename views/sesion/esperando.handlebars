@@ -13,15 +13,20 @@
         if ({{creador}})
             counter.innerHTML += data.namePart + " ya envió sus decisiones <br>";
     });
+    socket.on('online',function (data) {
+        document.getElementById('test').innerHTML += data.username + "<br>";
+    });
 
 </script>
 
 Conectados: <br>
 {{#each names as |c|}}
-    {{c}}
+    {{c}} <br>
 {{/each}}
+<div id="chat-window">
+    <div id="test"></div>
+</div>
 <br>
-
 Index: {{{indexEsc}}}<br>
 {{#if creador}}
     {{#each revisados as |r|}}

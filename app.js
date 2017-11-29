@@ -12,17 +12,18 @@ var expressValidator = require('express-validator');
 var nodemailer = require("nodemailer");
 var crypto = require('crypto');
 var listaSesiones={};
+var lista_sockets = {};
 var listaDecisiones=null;
 var logueados = {};
 var resultado_por_escenario = {};
 var resultado_final = [];
+var resultados = {};
 var bool_result_final = [-1,false, false, true]; /*[0] index del grafico por escenario
                                              [1] cargar a la pagina de result final,
                                              [2] que los part puedan ir a result final
                                              [3] que no se vuelvan a cargar resultados al
                                               recargar la pagina
                                               [4] juntar los graficos*/
-
 // Init App
 var app = express();
 
@@ -90,7 +91,7 @@ app.use(nodeadmin(app));
 
 
 //Routes
-require('./router/routes.js')(app, passport, nodemailer, crypto, listaSesiones,listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final); // load our routes and pass in our app and fully configured passport
+require('./router/routes.js')(app, passport, nodemailer, crypto, listaSesiones,listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final, resultados); // load our routes and pass in our app and fully configured passport
 require('./config/passport')(passport, logueados); // pass passport for configuration
 app.use('/api', require('./router/api'));
 
@@ -118,6 +119,7 @@ models.sequelize.sync().then(function () {
         console.log('Alguien se ha conectado con Sockets',socket.id, socket.username);
 
         socket.on('online', function (data) {
+            console.log("ESTOY ENVIANDO EL PUTO SOCKET", data.username);
             io.sockets.emit('online', data);
         });
         socket.on('chat', function (data) {

@@ -3,6 +3,7 @@ var message = document.getElementById('message'),
     handle = document.getElementById('handle'),
     btn = document.getElementById('send'),
     output = document.getElementById('output');
+    test = document.getElementById('test');
 
 socket.emit('conectado', {
     username: handle.value,
@@ -40,3 +41,6 @@ function myFunction(event) {
     }
 }
 
+socket.on('online',function (data) {
+    test.innerHTML += data.username + "<br>";
+});

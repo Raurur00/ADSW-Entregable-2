@@ -28,10 +28,16 @@
                 </thead>
                 <% dec.forEach(function(decision) { %>
                     <tbody>
-                    <td><input type="checkbox" class="checks" name = "lang[]" value = "<%= decision.id %>"></td><br>
+                    <td><input type="hidden" name="ids[]" value="<%= decision.id %>"></td>
                     <td><%= decision.nombre %></td>
                     <td><%= decision.mecanismo %></td>
                     <td><%= decision.resultado %></td>
+                    <td><select name="prioridad">
+                        <option value="Alta">Alta</option>
+                        <option value="Media">Media</option>
+                        <option value="Baja">Baja</option>
+                        <option value="No Seleccionada">No Seleccionada</option>
+                    </select></td>
                     </tbody>
                 <% }); %>
 
@@ -95,7 +101,7 @@
 
         //Enviar mensaje al hacer click
         resultado.addEventListener('click',function () {
-            if ("<%= nocreador %>") {
+            if ("<%= nocreador %>" == "true") {
                 socket.emit('resultado', {
                     idPart: "<%= idPart %>",
                 indexEsc: "<%= indexEsc %>",

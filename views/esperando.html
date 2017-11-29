@@ -18,11 +18,8 @@
             document.location.reload(true);
         });
         socket.on('resultado',function (data) {
-            if ("<%= creador %>")
+            if ("<%= creador %>" == "true")
             counter.innerHTML += data.namePart + " ya envió sus decisiones <br>";
-        });
-        socket.on('online',function (data) {
-            document.getElementById('test').innerHTML += data.username + "<br>";
         });
     </script>
     <div class="col-md-4 col-md-offset-4">
@@ -39,7 +36,7 @@
                 <%= r  %> ya envió sus decisiones <br>
             <% }); %>
         <% } %>
-
+        <div id="counter"></div>
         <div id="mario-chat">
             <div id="chat-window">
                 <div id="output"></div>

@@ -4,6 +4,7 @@ var GRAFICO = GRAFICO || (function(){
     return {
         init : function(Args) {
             _args = Args;
+            alert(_args[0]);
             // some other initialising
         },
         helloWorld : function() {

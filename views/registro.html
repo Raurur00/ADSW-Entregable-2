@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/public/css/bootstrap.css" />
+    <link rel="stylesheet" href="/public/css/style.css" />
+
+</head>
+<%- include("layout.html"); %>
+<body>
+    <div class="col-md-4 col-md-offset-4">
+        <% if (error.length > 0) { %>
+            <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        <h2 class="page-header">Registrate en nuestra página!</h2>
+        <form method="post" action="/registro">
+            <div class="form-group">
+                <label>Nombre de usuario</label>
+                <input type="text" class="form-control" placeholder="Username" name="username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" placeholder="Email" name="email">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" class="form-control" placeholder="Password" name="password">
+            </div>
+            <div class="form-group">
+                <label>Confirmar contraseña</label>
+                <input type="password" class="form-control" placeholder="Password" name="password2">
+            </div>
+            <button type="submit" class="btn btn-default">Registrarse</button>
+        </form>
+    </div>
+</body>

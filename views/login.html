@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/public/css/bootstrap.css" />
+    <link rel="stylesheet" href="/public/css/style.css" />
+
+</head>
+<%- include("layout.html"); %>
+<body>
+<div class="col-md-4 col-md-offset-4">
+    <h2 class="page-header">Inicia en tu cuenta!</h2>
+    <form method="post" action="/login">
+        <% if (error.length > 0) { %>
+            <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-control" name="email" placeholder="Email">
+        </div>
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-default">Entrar</button>
+    </form>
+</div>
+</body>

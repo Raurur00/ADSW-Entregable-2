@@ -21,9 +21,18 @@
             if ("<%= creador %>")
             counter.innerHTML += data.namePart + " ya envió sus decisiones <br>";
         });
+        socket.on('online',function (data) {
+            document.getElementById('test').innerHTML += data.username + "<br>";
+        });
     </script>
     <div class="col-md-4 col-md-offset-4">
         Conectados: <br>
+        <% names.forEach(function(nombre) { %>
+            <%= nombre %><br>
+        <% }); %>
+        <div id="chat-window2">
+            <div id="test"></div>
+        </div>
         Index: <%= indexEsc %><br>
         <% if (creador) { %>
             <% revisados.forEach(function(r) { %>

@@ -8,12 +8,9 @@ var encrypt = require('../controllers/encrypt');
 
 module.exports = function(app, passport, nodemailer, crypto, listaSesiones, listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final) {
 
-    app.get('/probando', function(req, res) {
-        res.render('probando.html');
-    });
-
     app.get('/', function (req, res) {
-        res.render('index.html', {errors: false});
+        res.render('index.html', {success: req.flash('success'),
+            error: req.flash('error')});
     });
 
     app.get('/layout', function(res) {
@@ -21,7 +18,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     });
     //////////////////////////LOGIN///////////////////////////////////////
     app.get('/login', function (req, res) {
-        res.render('login', {message: req.flash('loginMessage'), sesionActivada: false});
+        res.render('login.html', {success: req.flash('success'),
+            error: req.flash('error')});
     });
 
     app.post('/login', passport.authenticate('local-login', {
@@ -30,13 +28,15 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         failureFlash: true // allow flash messages
     }));
 
-    app.get('/signup', function (req, res) {
-        res.render('signup', {message: req.flash('signupMessage')});
+    app.get('/registro', function (req, res) {
+        console.log("HOLAAAA");
+        res.render('registro.html', {success: req.flash('success'),
+            error: req.flash('error')});
     });
 
-    app.post('/signup', passport.authenticate('local-signup', {
+    app.post('/registro', passport.authenticate('local-signup', {
         successRedirect: '/', // redirect to the secure profiles.handlebars section
-        failureRedirect: '/signup', // redirect back to the signup page if there is an error
+        failureRedirect: '/registro', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
 
@@ -330,6 +330,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             listaSesiones[idSesion].conectados.push(part);
             console.log("estoy en username del mod en get en logueado: ", listaSesiones[idSesion].participantes);
             res.render('esperando.html', {
+                names: [],
                 noresultado: true,
                 username: req.user.username,
                 idSesion: idSesion,
@@ -367,6 +368,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             listaSesiones[idSesion].conectados.push(part);
             console.log("estoy en username del part en get en logueado: ", listaSesiones[idSesion].participantes);
             res.render('esperando.html', {
+                names: [],
                 noresultado: true,
                 username: req.user.username,
                 idSesion: idSesion,
@@ -393,90 +395,171 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     /////////////////////// PANTALLA DE ESPERA/CHAT ////////////////////////////////////
     app.get('/sesion/mod/iniciando/:idSesion/:emailInv', function (req, res) {
         var names_conectados = [];
+        var moderador_guardado = false;
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
-        new Promise(function (resolve, reject) {
-            part = new Participante(null, req.body.username, null, false);
-            part.crearParticipante(resolve);
-        }).then(function (data) {
-            part.id = data;
-            part.crearSesionUser(idSesion);
-            part.guardarModerador(idSesion);
-            listaSesiones[idSesion].moderador = part.id;
-            listaSesiones[idSesion].participantes.push(part);
-            listaSesiones[idSesion].conectados.push(part);
-            console.log("CONECTADOS", listaSesiones[idSesion].conectados);
-            for (i = 0; i < listaSesiones[idSesion].conectados.length; i++){
-                console.log(listaSesiones[idSesion].conectados[i].username);
+        for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
+            if (listaSesiones[idSesion].conectados[i].username != req.body.username)
                 names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+        }
+        for (j = 0; j < listaSesiones[idSesion].participantes.length; j++){
+            if (listaSesiones[idSesion].participantes[j].id == listaSesiones[idSesion].moderador) {
+                moderador_guardado = true;
+                break;
             }
-            console.log("estoy en iniciando del mod en get sin loguear: ", listaSesiones[idSesion].participantes);
+        }
+        if (!moderador_guardado) {
+            new Promise(function (resolve, reject) {
+                part = new Participante(null, req.body.username, null, false);
+                part.crearParticipante(resolve);
+            }).then(function (data) {
+                part.id = data;
+                part.crearSesionUser(idSesion);
+                part.guardarModerador(idSesion);
+                listaSesiones[idSesion].moderador = part.id;
+                listaSesiones[idSesion].participantes.push(part);
+                listaSesiones[idSesion].conectados.push(part);
+                console.log("CONECTADOS", listaSesiones[idSesion].conectados);
+                console.log("estoy en iniciando del mod en get sin loguear: ", listaSesiones[idSesion].participantes);
+                res.render('esperando.html', {
+                    names: names_conectados,
+                    noresultado: true,
+                    username: req.body.username,
+                    emailInv: null,
+                    emailInvEnc: req.params.emailInv,
+                    idSesion: idSesion,
+                    idSesionEnc: req.params.idSesion,
+                    creador: true,
+                    idPart: part.id,
+                    idPartEnc: encrypt(String(part.id), crypto),
+                    indexEsc: 0,
+                    revisados: [],
+                    inicio: listaSesiones[idSesion].inicio
+                });
+            });
+        }   else {
             res.render('esperando.html', {
                 names: names_conectados,
                 noresultado: true,
-                username: part.username,
-                emailInv: part.email,
+                username: req.body.username,
+                emailInv: null, //part.email
                 emailInvEnc: req.params.emailInv,
                 idSesion: idSesion,
                 idSesionEnc: req.params.idSesion,
                 creador: true,
-                idPart: part.id,
-                idPartEnc: encrypt(String(part.id), crypto),
+                idPart: listaSesiones[idSesion].moderador, //part.id
+                idPartEnc: encrypt(String(listaSesiones[idSesion].moderador), crypto), //encrypt(String(part.id), crypto),
                 indexEsc: 0,
                 inicio: listaSesiones[idSesion].inicio,
                 revisados: []
             });
-        });
+        }
     });
     app.post('/sesion/mod/iniciando/:idSesion/:emailInv', function (req, res) {
         var names_conectados = [];
+        var moderador_guardado = false;
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
-        new Promise(function (resolve, reject) {
-            part = new Participante(null, req.body.username, null, false);
-            part.crearParticipante(resolve);
-        }).then(function (data) {
-            part.id = data;
-            part.crearSesionUser(idSesion);
-            part.guardarModerador(idSesion);
-            listaSesiones[idSesion].moderador = part.id;
-            listaSesiones[idSesion].participantes.push(part);
-            listaSesiones[idSesion].conectados.push(part);
-            console.log("CONECTADOS2", listaSesiones[idSesion].conectados);
-            for (i = 0; i < listaSesiones[idSesion].conectados.length; i++){
+        for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
+            if (listaSesiones[idSesion].conectados[i].username != req.body.username)
                 names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+        }
+        for (j = 0; j < listaSesiones[idSesion].participantes.length; j++){
+            if (listaSesiones[idSesion].participantes[j].id == listaSesiones[idSesion].moderador) {
+                moderador_guardado = true;
+                break;
             }
-            console.log("estoy en iniciando del mod en post sin loguear: ", listaSesiones[idSesion].participantes);
+        }
+        if (!moderador_guardado) {
+            new Promise(function (resolve, reject) {
+                part = new Participante(null, req.body.username, null, false);
+                part.crearParticipante(resolve);
+            }).then(function (data) {
+                part.id = data;
+                part.crearSesionUser(idSesion);
+                part.guardarModerador(idSesion);
+                listaSesiones[idSesion].moderador = part.id;
+                listaSesiones[idSesion].participantes.push(part);
+                listaSesiones[idSesion].conectados.push(part);
+                console.log("CONECTADOS2", listaSesiones[idSesion].conectados);
+                console.log("estoy en iniciando del mod en post sin loguear: ", listaSesiones[idSesion].participantes);
+                res.render('esperando.html', {
+                    names: names_conectados,
+                    noresultado: true,
+                    username: part.username,
+                    emailInv: part.email,
+                    emailInvEnc: req.params.emailInv,
+                    idSesion: idSesion,
+                    idSesionEnc: req.params.idSesion,
+                    creador: true,
+                    idPart: part.id,
+                    idPartEnc: encrypt(String(part.id), crypto),
+                    indexEsc: 0,
+                    revisados: [],
+                    inicio: listaSesiones[idSesion].inicio
+                });
+            });
+        }   else {
             res.render('esperando.html', {
                 names: names_conectados,
                 noresultado: true,
-                username: part.username,
-                emailInv: part.email,
+                username: req.body.username,
+                emailInv: null, //part.email
                 emailInvEnc: req.params.emailInv,
                 idSesion: idSesion,
                 idSesionEnc: req.params.idSesion,
                 creador: true,
-                idPart: part.id,
-                idPartEnc: encrypt(String(part.id), crypto),
+                idPart: listaSesiones[idSesion].moderador, //part.id
+                idPartEnc: encrypt(String(listaSesiones[idSesion].moderador), crypto), //encrypt(String(part.id), crypto),
                 indexEsc: 0,
                 inicio: listaSesiones[idSesion].inicio,
                 revisados: []
             });
-        });
+        }
     });
 
     app.post('/sesion/part/iniciando/:idSesion/:emailInv', function (req, res) {
+        var names_conectados = [];
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
         var emailInv = decrypt(req.params.emailInv, crypto);
-        if (listaSesiones[idSesion].inicio){
+        var bool = true;
+        for (i = 0; i < listaSesiones[idSesion].participantes.length; i++){
+            console.log(listaSesiones[idSesion].participantes[i].email,emailInv);
+            if (String(listaSesiones[idSesion].participantes[i].email) == String(emailInv))  {
+                for (j = 0; j < listaSesiones[idSesion].conectados.length; j++){
+                    if (listaSesiones[idSesion].conectados[j].username != listaSesiones[idSesion].participantes[i].username)
+                        names_conectados.push(listaSesiones[idSesion].conectados[j].username);
+                }
+                res.render('esperando.html', {
+                    names: names_conectados,
+                    noresultado: true,
+                    username: listaSesiones[idSesion].participantes[i].username,
+                    idSesion: idSesion,
+                    idSesionEnc: req.params.idSesion,
+                    creador: false,
+                    idPart: listaSesiones[idSesion].participantes[i].id,
+                    idPartEnc: encrypt(String(listaSesiones[idSesion].participantes[i].id), crypto),
+                    indexEsc: 0,
+                    inicio: listaSesiones[idSesion].inicio,
+                    revisados: []
+                });
+                bool = false;
+                break;
+            }
+        }
+        if (bool) {
             new Promise(function (resolve, reject) {
                 part = new Participante(emailInv, req.body.username, null, false);
                 part.crearParticipante(resolve);
             }).then(function (data) {
                 part.id = data;
                 part.crearSesionUser(idSesion);
+                for (j = 0; j < listaSesiones[idSesion].conectados.length; j++){
+                    names_conectados.push(listaSesiones[idSesion].conectados[j].username);
+                }
                 listaSesiones[sesion.id].participantes.push(part);
                 listaSesiones[sesion.id].conectados.push(part);
-                console.log("estoy en iniciando del part en post sin loguear: ", listaSesiones[idSesion].participantes);
+                console.log("estoy en iniciando del part en post sin loguear: ", listaSesiones[idSesion].participantes.length);
                 res.render('esperando.html', {
+                    names: names_conectados,
                     noresultado: true,
                     username: part.username,
                     idSesion: idSesion,
@@ -488,19 +571,6 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                     inicio: listaSesiones[idSesion].inicio,
                     revisados: []
                 });
-            });
-        }   else {
-            res.render('esperando.html', {
-                noresultado: true,
-                username: req.body.username,
-                idSesion: idSesion,
-                idSesionEnc: req.params.idSesion,
-                creador: false,
-                idPart: null,
-                idPartEnc: null,
-                indexEsc: 0,
-                inicio: listaSesiones[idSesion].inicio,
-                revisados: []
             });
         }
     });
@@ -590,15 +660,20 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var idSesion = parseInt(decrypt(String(req.params.idSesion), crypto));
         var idPart = parseInt(decrypt(String(req.params.idPart), crypto));
         var indexEsc = parseInt(req.params.indexEsc);
+        var names_conectados = [];
+        for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
+            if (listaSesiones[idSesion].conectados[i].username != req.params.username)
+                names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+        }
         escenarioActual = (listaSesiones[idSesion].escenarios)[indexEsc];
         var creador = false;
         if (parseInt(listaSesiones[idSesion].moderador) === parseInt(idPart)) {
             creador = true;
         }
-        console.log("REVISADOOOOOOOOOOOOOOS", listaSesiones[idSesion].escenarios[indexEsc].revisados);
         indexEsc = parseInt(indexEsc)+1;
         if (indexEsc <= listaSesiones[idSesion].escenarios.length) {
             res.render('esperando.html', {
+                names: names_conectados,
                 noresultado: false,
                 username: req.params.username,
                 idSesion: idSesion,
@@ -704,7 +779,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             creador: creador,
             inicio: listaSesiones[idSesion].inicio,
             result_final: bool_result_final[1],
-            result_final_part: bool_result_final[2]
+            result_final_part: bool_result_final[2],
         });
     });
 

@@ -8,12 +8,9 @@ var encrypt = require('../controllers/encrypt');
 
 module.exports = function(app, passport, nodemailer, crypto, listaSesiones, listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final) {
 
-    app.get('/probando', function(req, res) {
-        res.render('probando.html');
-    });
-
     app.get('/', function (req, res) {
-        res.render('index.html', {errors: false});
+        res.render('index.html', {success: req.flash('success'),
+            error: req.flash('error')});
     });
 
     app.get('/layout', function(res) {
@@ -21,7 +18,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     });
     //////////////////////////LOGIN///////////////////////////////////////
     app.get('/login', function (req, res) {
-        res.render('login', {message: req.flash('loginMessage'), sesionActivada: false});
+        res.render('login.html', {success: req.flash('success'),
+            error: req.flash('error')});
     });
 
     app.post('/login', passport.authenticate('local-login', {
@@ -30,13 +28,15 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         failureFlash: true // allow flash messages
     }));
 
-    app.get('/signup', function (req, res) {
-        res.render('signup', {message: req.flash('signupMessage')});
+    app.get('/registro', function (req, res) {
+        console.log("HOLAAAA");
+        res.render('registro.html', {success: req.flash('success'),
+            error: req.flash('error')});
     });
 
-    app.post('/signup', passport.authenticate('local-signup', {
+    app.post('/registro', passport.authenticate('local-signup', {
         successRedirect: '/', // redirect to the secure profiles.handlebars section
-        failureRedirect: '/signup', // redirect back to the signup page if there is an error
+        failureRedirect: '/registro', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
 

@@ -51,18 +51,16 @@ module.exports = function(passport, logueados) {
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, email, password, done) {
-
+            console.log("En local-signup");
             // find a user whose email is the same as the forms email
             // we are checking to see if the user trying to login already exists
             connection.query("select * from Participante where email = '"+email+"'",function(err,rows){
-                console.log(rows);
-                console.log("above row object");
                 if (err) {
-                    req.flash('error', 'e r r o r');
+                    req.flash('error', 'Error');
                     return done(err);
                 }
                 if (rows.length) {
-                    req.flash('error_msg', 'that email is already t h i c c');
+                    req.flash('error', 'Error: no pudimos registrarte.');
                     return done(null, false);
                 } else {
                     var newUserMysql = new Object();
@@ -75,8 +73,7 @@ module.exports = function(passport, logueados) {
                         email: email,
                         registrado: true
                     }).then(function (result) {
-                        console.log(result);
-                        req.flash('success_msg', 'all t h i c c');
+                        req.flash('success', 'Ya estas registrado!');
                         newUserMysql.id = result.id;
                         logueados[result.id] = {email: newUserMysql.email, username: req.body.username,
                             password: newUserMysql.password, enSesion: false, idSesion: 0};
@@ -99,21 +96,20 @@ module.exports = function(passport, logueados) {
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, email, password, done) { // callback with email and password from our form
-
+            console.log("En local-login");
             connection.query("SELECT * FROM Participante WHERE email = '" + email + "'",function(err,rows){
                 if (err)
                     return done(err);
                 if (!rows.length) {
-                    return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
+                    return done(null, false, req.flash('error', 'Usuario no encontrado.'));
                 }
 
                 // if the user is found but the password is wrong
                 if (!( rows[0].password == password))
-                    return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
+                    return done(null, false, req.flash('error', 'Contraseña incorrecta.'));
 
                 // all is well, return successful user
-                req.flash('success_msg', 'all t h i c c');
-                console.log("djskljdklsa ", rows[0]);
+                req.flash('success', 'Ya estas en tu cuenta!');
                 logueados[rows[0].id] = {email: rows[0].email, username: rows[0].username,
                     password: rows[0].password, enSesion: false, idSesion: 0};
                 return done(null, rows[0]);

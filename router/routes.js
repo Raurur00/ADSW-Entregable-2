@@ -6,6 +6,7 @@ var models  = require('../models');
 var decrypt = require('../controllers/decrypt');
 var encrypt = require('../controllers/encrypt');
 
+
 module.exports = function(app, passport, nodemailer, crypto, listaSesiones, listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final,jsontoxml) {
 
     app.get('/', function (req, res) {
@@ -632,13 +633,16 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var idSesion = parseInt(decrypt(String(req.params.idSesion), crypto));
         var idPart = parseInt(decrypt(String(req.params.idPart), crypto));
         var indexEsc = parseInt(req.params.indexEsc);
+        console.log("PRIORIDAD: ",req.body.prioridad);
+        console.log(req.body.ids);
         listaSesiones[idSesion].inicio = false;
         escenarioActual = (listaSesiones[idSesion].escenarios)[indexEsc];
         // cambie lang por dec
-        req.body.lang.forEach(function (idDecision) {
-            console.log(idDecision);
-            escenarioActual.crearVoto(idDecision,idPart);
+        req.body.ids.forEach(function (idDecision) {
+            console.log(idDecision, req.body.prioridad[idDecision-1]);
+            escenarioActual.crearVoto(req.body.prioridad[idDecision-1], idDecision,idPart);
             escenarioActual.votos.push({
+                prioridad: req.body.prioridad[idDecision-1],
                 idDecision: idDecision,
                 idParticipante: idPart
             });
@@ -716,9 +720,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         for(i = 0; i < votosEsc.length; i++) {
             VotosporPar[votosEsc[i].idParticipante] = [];
         }
-
         for(i = 0; i < votosEsc.length; i++) {
-            VotosporPar[votosEsc[i].idParticipante].push(votosEsc[i].idDecision);
+            VotosporPar[votosEsc[i].idParticipante].push([votosEsc[i].idDecision,votosEsc[i].prioridad]);
         }
 
         for(i = 0; i < votosEsc.length; i++) {
@@ -744,7 +747,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             resultado_final.push(contFinal);
         }
 
-        F = [];
+        F = []; /*F=[[nombrePart1, [[dec1,prioridad],[dec2,prioridad],...]],
+                    [nombrePart2, [[dec1,prioridad],[dec2,prioridad],...]]]*/
         for (idPart in VotosporPar){
             aux = [];
             aux2 = [];
@@ -757,8 +761,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             }
             for (dec = 0; dec < VotosporPar[idPart].length; dec++) {
                 for (i = 0; i < listaDecisiones.length; i++) {
-                    if (parseInt(listaDecisiones[i].id) == parseInt(VotosporPar[idPart][dec])) {
-                        aux2.push(listaDecisiones[i].nombre);
+                    if (parseInt(listaDecisiones[i].id) == parseInt(VotosporPar[idPart][dec][0])) {
+                        aux2.push([listaDecisiones[i].nombre,VotosporPar[idPart][dec][1]]);
                         break;
                     }
                 }
@@ -767,12 +771,16 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
 
             F.push(aux);
         }
+        resultados[indexEsc-1] = F;
         console.log(F);
         console.log(resultado_final);
+        console.log(resultados);
+
         res.render('resultadoEsc.html', {
             VotosporPart: F,
             probando: contFinal,
             username: req.params.username,
+            idSesion: idSesion,
             idSesionEnc: req.params.idSesion,
             idPartEnc: req.params.idPart,
             indexEsc: indexEsc,

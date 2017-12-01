@@ -15,10 +15,12 @@ var jsontoxml = require('jsontoxml');
 var lista_sockets = {};
 var resultados = {};
 var listaSesiones={};
+var lista_sockets = {};
 var listaDecisiones=null;
 var logueados = {};
 var resultado_por_escenario = {};
 var resultado_final = [];
+var resultados = {};
 var bool_result_final = [-1,false, false, true]; /*[0] index del grafico por escenario
                                              [1] cargar a la pagina de result final,
                                              [2] que los part puedan ir a result final
@@ -92,6 +94,7 @@ app.use(nodeadmin(app));
 
 
 //Routes
+
 require('./router/routes.js')(app, passport, nodemailer, crypto, listaSesiones,listaDecisiones,
     logueados, resultado_por_escenario, bool_result_final, resultado_final, resultados,jsontoxml);
 require('./config/passport')(passport, logueados); // pass passport for configuration

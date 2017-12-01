@@ -1,0 +1,79 @@
+<link rel="stylesheet" href="/public/css/bootstrap.css" />
+<link rel="stylesheet" href="/public/css/style.css" />
+<script src="/controllers/sesionCtrl.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+<div align="center" id="title"></div>
+
+<div id="altas"></div>
+<div id="medias"></div>
+<div id="altas_medias"></div>
+
+<div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+<div id="container2" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+<div id="container3" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+<div id="container4" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+
+<form method="post" action="/sesion/resultfinal/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
+
+<select name="escenarios">
+    <% esc.forEach(function(e) { %>
+    <option value="<%=e%>">Escenario <%= e %></option>
+    <% }); %>
+</select>
+
+<button type="submit" class="btn btn-lg btn-info">Cargar Escenario</button>
+</form>
+
+<script type="text/javascript" src="/public/js/grafico.js"></script>
+<script type="text/javascript">
+    var socket = io.connect(window.location.host);
+    var prob = JSON.parse('<%-JSON.stringify(probando)%>');
+    var prob1 = JSON.parse('<%-JSON.stringify(probando1)%>');
+    var prob2 = JSON.parse('<%-JSON.stringify(probando2)%>');
+    var prob3 = JSON.parse('<%-JSON.stringify(probando3)%>');
+    var list_idx = JSON.parse('<%-JSON.stringify(idx)%>');
+    var idx = parseInt(list_idx[0]);
+
+    var decs_altas = JSON.parse('<%-JSON.stringify(todos_alta)%>')[idx-1][1];
+    var decs_medias = JSON.parse('<%-JSON.stringify(todos_media)%>')[idx-1][1];
+    var decs_altas_medias = JSON.parse('<%-JSON.stringify(todos_media_alta)%>')[idx-1][1];
+
+    socket.on('start',function (data) {
+        document.location.reload(true);
+    });
+    socket.on('resultFinal',function (data) {
+        document.location.reload(true);
+    });
+    GRAFICO.init(idx,[prob[idx-1],prob1[idx-1],prob2[idx-1],prob3[idx-1]],["Decisiones con prioridad alta",
+            "Decisiones con prioridad media","Decisiones con prioridad media-alta","Decisiones no seleccionadas"],
+        ["container","container2","container3","container4"]);
+    GRAFICO.draw();
+
+    if (decs_altas.length > 0)  document.getElementById("altas").innerHTML =
+        "Decisiones seleccionadas por todos y prioridad alta:";
+    if (decs_medias.length > 0) document.getElementById("medias").innerHTML =
+        "Decisiones seleccionadas por todos y prioridad media:";
+    if (decs_altas_medias.length > 0) document.getElementById("altas_medias").innerHTML =
+        "Decisiones seleccionadas por todos y prioridad alta/media:";
+
+    for (var i = 0; i < decs_altas.length; i++)
+    {
+        if (i == 0 ) document.getElementById("altas").innerHTML += " " + decs_altas[i];
+        else document.getElementById("altas").innerHTML += "," + decs_altas[i];
+    }
+    for (var i = 0; i < decs_medias.length; i++)
+    {
+        if (i == 0 ) document.getElementById("medias").innerHTML += " " + decs_medias[i];
+        else document.getElementById("medias").innerHTML += "," + decs_medias[i];
+    }
+    for (var i = 0; i < decs_altas_medias.length; i++)
+    {
+        if (i == 0 ) document.getElementById("altas_medias").innerHTML += " " + decs_altas_medias[i];
+        else document.getElementById("altas_medias").innerHTML += "," + decs_altas_medias[i];
+    }
+</script>

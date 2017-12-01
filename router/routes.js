@@ -6,8 +6,14 @@ var models  = require('../models');
 var decrypt = require('../controllers/decrypt');
 var encrypt = require('../controllers/encrypt');
 
+module.exports = function(app, passport, nodemailer, crypto, listaSesiones,
+                          listaDecisiones, logueados, resultado_por_escenario,
+                          bool_result_final, resultado_final, resultados,jsontoxml
+){
 
-module.exports = function(app, passport, nodemailer, crypto, listaSesiones, listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final,jsontoxml) {
+    app.get('/probandoChat', function(req, res) {
+        res.render('probandoChat.html');
+    });
 
     app.get('/', function (req, res) {
         res.render('index.html', {success: req.flash('success'),
@@ -30,7 +36,6 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     }));
 
     app.get('/registro', function (req, res) {
-        console.log("HOLAAAA");
         res.render('registro.html', {success: req.flash('success'),
             error: req.flash('error')});
     });
@@ -75,243 +80,49 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
     ///////////////////// CREAR SESION ///////////////////////////////////////
     app.get('/crear_sesion/:idSesionEnc', function (req, res) {
         res.render('crearSesion.html', {
-            errors: [],
             sesion: listaSesiones[parseInt(decrypt(req.params.idSesionEnc, crypto))],
-            idSesionEnc: req.params.idSesionEnc,
-            repetido: false,
-            propio: false,
-            notiempo: false,
-            notiempo: false,
-            escrepetido: false,
-            invitados: [],
-            escenarios: [],
-            noinv: false,
-            noesc: false
+            idSesionEnc: req.params.idSesionEnc
         });
     });
 
-    //////////// invitados /////////
-    app.post('/crear_sesion/invitar/:idSesionEnc', function (req, res) {
-        req.checkBody('email', 'Email is required').notEmpty();
-        req.checkBody('email', 'Email is not valid').isEmail();
-        var errors = req.validationErrors();
-        var repetido = false;
+
+    ///////////// CREAR SESION + ENVIAR INV + AGREGAR ESC//////////////
+    app.post('/crear_sesion/:idSesionEnc', function (req, res) {
+        console.log(req.body.invitados);
+        console.log(req.body.escenarios);
         var idSesion = parseInt(decrypt(String(req.params.idSesionEnc), crypto));
-        listaSesiones[idSesion].invitados.forEach(function (invitado) {
-            if (invitado.email.toString() === req.body.email.toString()) {
-                repetido = true;
-                return;
-            }
-        });
-        if (repetido) {
-            res.render('crearSesion.html', {
-                errors: errors,
-                sesion: listaSesiones[idSesion],
-                idSesionEnc: req.params.idSesionEnc,
-                repetido: true,
-                propio: false,
-                notiempo: false,
-                escrepetido: false,
-                invitados: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
-                escenarios: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
-                noinv: false,
-                noesc: false
-            });
-            return;
-        }
-        if (req.user) {
-            if (req.user.email.toString() === req.body.email.toString()) {
-                res.render('crearSesion.html', {
-                    errors: errors,
-                    sesion: listaSesiones[idSesion],
-                    idSesionEnc: req.params.idSesionEnc,
-                    repetido: false,
-                    propio: true,
-                    notiempo: false,
-                    escrepetido: false,
-                    invitados: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
-                    escenarios: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
-                    noinv: false,
-                    noesc: false
-                });
-                return;
-            }
-        }
-        if (!errors) {
-            invitado = new Invitado(req.body.email);
+        JSON.parse(req.body.invitados).forEach(function(invitado){
+            invitado = new Invitado(invitado);
             listaSesiones[idSesion].invitados.push(invitado);
-        }
-        res.render('crearSesion.html', {
-            errors: errors,
-            sesion: listaSesiones[idSesion],
-            idSesionEnc: req.params.idSesionEnc,
-            repetido: false,
-            propio: false,
-            notiempo: false,
-            escrepetido: false,
-            invitados: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
-            escenarios: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
-            noinv: false,
-            noesc: false
         });
-    });
-
-    /////////////// añadiendo escenarios ///////////////
-    app.post('/crear_sesion/esc/:idSesionEnc', function (req, res) {
-        req.checkBody('esc', 'escribe un objetivo').notEmpty();
-        req.checkBody('hh', 'la hora debe ser un número entero').isInt();
-        req.checkBody('mm', 'los minutos deben ser un número entero').isInt();
-        req.checkBody('ss', 'los segundos deben ser un número entero').isInt();
-        var errors = req.validationErrors();
-        var idSesion = parseInt(decrypt(String(req.params.idSesionEnc), crypto));
-        if (!req.body.hh && !req.body.mm && !req.body.ss) {
-            res.render('crearSesion.html', {
-                errors: errors,
-                sesion: listaSesiones[idSesion],
-                idSesionEnc: req.params.idSesionEnc,
-                repetido: false,
-                propio: false,
-                notiempo: true,
-                escrepetido: false,
-                invitados: listaSesiones[idSesion].invitados,
-                escenarios: listaSesiones[idSesion].escenarios,
-                noinv: false,
-                noesc: false
-            });
-            return;
-        }
-        var repetido = false;
-        listaSesiones[idSesion].escenarios.forEach(function (esc) {
-            if (esc.objetivo.toString() === req.body.esc.toString()) {
-                repetido = true;
-                return;
-            }
-        });
-        if (repetido) {
-            res.render('crearSesion.html', {
-                errors: errors,
-                sesion: listaSesiones[idSesion],
-                idSesionEnc: req.params.idSesionEnc,
-                repetido: false,
-                propio: false,
-                notiempo: false,
-                escrepetido: true,
-                invitados: listaSesiones[idSesion].invitados,
-                escenarios: listaSesiones[idSesion].escenarios,
-                noinv: false,
-                noesc: false
-            });
-            return;
-        }
-        if (!errors) {
-            new Promise(function (resolve, reject) {
-                esc = new Escenario(req.body.esc, req.body.hh, req.body.mm, req.body.ss, idSesion);
+        JSON.parse(req.body.escenarios).forEach(function(esc) {
+            new Promise(function (resolve) {
+                esc = new Escenario(esc.obj, esc.hh, esc.mm, esc.ss, idSesion);
                 esc.crearEscenario(resolve);
             }).then(function (data) {
                 esc.id = data;
                 esc.crearSesionEsc();
                 listaSesiones[idSesion].escenarios.push(esc);
-                res.render('crearSesion.html', {
-                    errors: false,
-                    sesion: listaSesiones[idSesion],
-                    idSesionEnc: req.params.idSesionEnc,
-                    repetido: false,
-                    propio: false,
-                    notiempo: false,
-                    escrepetido: false,
-                    invitados: listaSesiones[idSesion].invitados,
-                    escenarios: listaSesiones[idSesion].escenarios,
-                    noinv: false,
-                    noesc: false
-                });
             });
-        } else {
-            res.render('crearSesion.html', {
-                errors: errors,
-                sesion: listaSesiones[idSesion],
-                idSesionEnc: req.params.idSesionEnc,
-                repetido: false,
-                propio: false,
-                notiempo: false,
-                escrepetido: false,
-                invitados: listaSesiones[idSesion].invitados,
-                escenarios: listaSesiones[idSesion].escenarios,
-                noinv: false,
-                noesc: false
-            });
-        }
-    });
+        });
 
-    /////////////enviar invitaciones//////////////
-    app.post('/crear_sesion/:idSesionEnc', function (req, res) {
-        var idSesion = parseInt(decrypt(String(req.params.idSesionEnc), crypto));
-        if (listaSesiones[idSesion].invitados.length === 0 && listaSesiones[idSesion].escenarios.length === 0) {
-            res.render('crearSesion.html', {
-                sesion: listaSesiones[idSesion],
-                noinv: true,
-                noesc: true,
-                idSesionEnc: req.params.idSesionEnc,
-                errors: false,
-                repetido: false,
-                propio: false,
-                notiempo: false,
-                escrepetido: false,
-                invitados: listaSesiones[idSesion].invitados,
-                escenarios: listaSesiones[idSesion].escenarios
-            });
-            return;
-        }
-        else if (listaSesiones[idSesion].invitados.length === 0) {
-            res.render('crearSesion.html', {
-                sesion: listaSesiones[idSesion],
-                noinv: true,
-                idSesionEnc: req.params.idSesionEnc,
-                errors: false,
-                repetido: false,
-                propio: false,
-                notiempo: false,
-                escrepetido: false,
-                invitados: listaSesiones[idSesion].invitados,
-                escenarios: listaSesiones[idSesion].escenarios
-            });
-            return;
-        }
-        else if (listaSesiones[idSesion].escenarios.length === 0) {
-            res.render('crearSesion.html', {
-                sesion: listaSesiones[idSesion],
-                noesc: true,
-                idSesionEnc: req.params.idSesionEnc,
-                errors: false,
-                repetido: false,
-                propio: false,
-                notiempo: false,
-                escrepetido: false,
-                invitados: listaSesiones[idSesion].invitados,
-                escenarios: listaSesiones[idSesion].escenarios
-            });
-            return;
-        }
-        else {
-            var smtpTransport = nodemailer.createTransport({
-                service: "gmail",
-                host: "smtp.gmail.com",
-                auth: {
-                    user: "i.t.force.76@gmail.com",
-                    pass: "mariobros1"
-                }
-            });
+        var smtpTransport = nodemailer.createTransport({
+            service: "gmail",
+            host: "smtp.gmail.com",
+            auth: {
+                user: "i.t.force.76@gmail.com",
+                pass: "mariobros1"
+            }
+        });
 
-            listaSesiones[idSesion].invitados.forEach(function (invitado) {
-                invitado.enviarEmail(smtpTransport, crypto, req.params.idSesionEnc, res);
-            });
+        listaSesiones[idSesion].invitados.forEach(function (invitado) {
+            invitado.enviarEmail(smtpTransport, crypto, req.params.idSesionEnc, res);
+        });
 
-            res.redirect('/sesion/moderador/username/'
-                + req.params.idSesionEnc + '/'
-                + encrypt(String(listaSesiones[idSesion].creador), crypto)
-            );
-
-            return;
-        }
+        res.redirect('/sesion/moderador/username/'
+            + req.params.idSesionEnc + '/'
+            + encrypt(String(listaSesiones[idSesion].creador), crypto)
+        );
     });
 
     ///////////////////////// PANTALLA USERNAME ////////////////////////////////
@@ -322,7 +133,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         if (req.isAuthenticated()) {
             logueados[req.user.id].enSesion = true;
             logueados[req.user.id].idSesion = idSesion;
-            part = new Participante(req.user.email, req.user.username, req.user.password, true);
+            var part = new Participante(req.user.email, req.user.username, req.user.password, true);
             part.id = req.user.id;
             part.crearSesionUser(idSesion);
             part.guardarModerador(idSesion);
@@ -399,11 +210,11 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var moderador_guardado = false;
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
         for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
-            if (listaSesiones[idSesion].conectados[i].username != req.body.username)
+            if (listaSesiones[idSesion].conectados[i].username !== req.body.username)
                 names_conectados.push(listaSesiones[idSesion].conectados[i].username);
         }
         for (j = 0; j < listaSesiones[idSesion].participantes.length; j++){
-            if (listaSesiones[idSesion].participantes[j].id == listaSesiones[idSesion].moderador) {
+            if (listaSesiones[idSesion].participantes[j].id === listaSesiones[idSesion].moderador) {
                 moderador_guardado = true;
                 break;
             }
@@ -419,7 +230,6 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 listaSesiones[idSesion].moderador = part.id;
                 listaSesiones[idSesion].participantes.push(part);
                 listaSesiones[idSesion].conectados.push(part);
-                console.log("CONECTADOS", listaSesiones[idSesion].conectados);
                 console.log("estoy en iniciando del mod en get sin loguear: ", listaSesiones[idSesion].participantes);
                 res.render('esperando.html', {
                     names: names_conectados,
@@ -460,11 +270,11 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var moderador_guardado = false;
         var idSesion = parseInt(decrypt(req.params.idSesion, crypto));
         for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
-            if (listaSesiones[idSesion].conectados[i].username != req.body.username)
+            if (listaSesiones[idSesion].conectados[i].username !== req.body.username)
                 names_conectados.push(listaSesiones[idSesion].conectados[i].username);
         }
         for (j = 0; j < listaSesiones[idSesion].participantes.length; j++){
-            if (listaSesiones[idSesion].participantes[j].id == listaSesiones[idSesion].moderador) {
+            if (listaSesiones[idSesion].participantes[j].id === listaSesiones[idSesion].moderador) {
                 moderador_guardado = true;
                 break;
             }
@@ -480,7 +290,6 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 listaSesiones[idSesion].moderador = part.id;
                 listaSesiones[idSesion].participantes.push(part);
                 listaSesiones[idSesion].conectados.push(part);
-                console.log("CONECTADOS2", listaSesiones[idSesion].conectados);
                 console.log("estoy en iniciando del mod en post sin loguear: ", listaSesiones[idSesion].participantes);
                 res.render('esperando.html', {
                     names: names_conectados,
@@ -523,10 +332,9 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var emailInv = decrypt(req.params.emailInv, crypto);
         var bool = true;
         for (i = 0; i < listaSesiones[idSesion].participantes.length; i++){
-            console.log(listaSesiones[idSesion].participantes[i].email,emailInv);
-            if (String(listaSesiones[idSesion].participantes[i].email) == String(emailInv))  {
+            if (String(listaSesiones[idSesion].participantes[i].email) === String(emailInv))  {
                 for (j = 0; j < listaSesiones[idSesion].conectados.length; j++){
-                    if (listaSesiones[idSesion].conectados[j].username != listaSesiones[idSesion].participantes[i].username)
+                    if (listaSesiones[idSesion].conectados[j].username !== listaSesiones[idSesion].participantes[i].username)
                         names_conectados.push(listaSesiones[idSesion].conectados[j].username);
                 }
                 res.render('esperando.html', {
@@ -579,32 +387,51 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
 
     ////////////////////////// ESCENARIOS //////////////////////////////////
     app.post('/sesion/escenario/:idSesion/:indexEsc/:idPart/:username', function (req, res) {
+        console.log("JELOUUUUUUUUUUUUU EDICION: ", req.body.editar);
         var idSesion = parseInt(decrypt(String(req.params.idSesion), crypto));
         var idPart = parseInt(decrypt(String(req.params.idPart), crypto));
         var nocreador = true;
+        var indexEsc = parseInt(req.params.indexEsc);
+        if (req.body.editar === "true") {
+            indexEsc -= 1;
+        }
         if (parseInt(listaSesiones[idSesion].moderador) === parseInt(idPart)) {
             nocreador = false;
         }
-        console.log("HORAAA",listaSesiones[idSesion].escenarios[req.params.indexEsc].hr_finish);
         var namePart = 0;
         bool_result_final[3] = true;
-        for (i = 0; i < listaSesiones[idSesion].participantes.length;i ++){
+        for (var i = 0; i < listaSesiones[idSesion].participantes.length;i ++){
             console.log(parseInt(listaSesiones[idSesion].participantes[i].id), parseInt(idPart), listaSesiones[idSesion].participantes[i].username);
             if (parseInt(listaSesiones[idSesion].participantes[i].id) === parseInt(idPart)) {
                 namePart = i;
             }
         }
-        listaSesiones[idSesion].escenarios[req.params.indexEsc].cont++;
-        listaSesiones[idSesion].IdxEscActual = parseInt(req.params.indexEsc);
+        listaSesiones[idSesion].escenarios[indexEsc].cont++;
+        listaSesiones[idSesion].IdxEscActual = indexEsc;
         listaSesiones[idSesion].inicio = true;
         listaSesiones[idSesion].escenarios.ver_resultado = false;
-        console.log(listaSesiones[idSesion].participantes);
-        console.log("CONECTADOS", listaSesiones[idSesion].conectados);
         var hr_finish = new Date().getTime();
-        hr_finish += 1000*60*60*listaSesiones[idSesion].escenarios[req.params.indexEsc].hh
-            + 1000*60*listaSesiones[idSesion].escenarios[req.params.indexEsc].mm
-            + 1000*listaSesiones[idSesion].escenarios[req.params.indexEsc].ss;
+        var tiempo_extra = hr_finish + 1000*60*10;
+        hr_finish += 1000*60*60*listaSesiones[idSesion].escenarios[indexEsc].hh
+            + 1000*60*listaSesiones[idSesion].escenarios[indexEsc].mm
+            + 1000*listaSesiones[idSesion].escenarios[indexEsc].ss;
+        ///////////////// AQUI GUARDARÉLOS VOTOS AHORA /////////////
+        ///////////// TAMBIEN DEBERIA IR EN RESULTADO FINAL :) /////////////
+        if (indexEsc !== 0 && req.body.editar === "false") {
+            console.log("GUARDANDOOOOOOOOOOOOOOOOOOOO!!!");
+            listaSesiones[idSesion].escenarios[indexEsc-1].votos.forEach(function(voto) {
+                listaSesiones[idSesion].escenarios[indexEsc-1].crearVoto(voto.prioridad, voto.idDecision ,voto.idParticipante);
+            });
+        }
         models.Decision.findAll().then(function (decision) {
+            var listaDecisionesXml={};
+            for (d in decision){
+                listaDecisionesXml['d'+d.toString()]={
+                    id:decision[d].id,
+                    nombre:decision[d].nombre,
+                    mecanismo: decision[d].mecanismo,
+                    resultado: decision[d].resultado};
+            }
             listaDecisiones=decision;
             res.render('decisiones.html', {
                 username: req.params.username,
@@ -612,16 +439,19 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 idSesionEnc: req.params.idSesion,
                 idPart: idPart,
                 idPartEnc: req.params.idPart,
-                indexEsc: parseInt(req.params.indexEsc),
-                dec: listaDecisiones,
-                esc: listaSesiones[idSesion].escenarios[req.params.indexEsc],
-                hor: listaSesiones[idSesion].escenarios[req.params.indexEsc].hh,
-                mi: listaSesiones[idSesion].escenarios[req.params.indexEsc].mm,
-                se: listaSesiones[idSesion].escenarios[req.params.indexEsc].ss,
+                indexEsc: indexEsc,
+                dec: jsontoxml(JSON.stringify({decisiones:listaDecisionesXml})),
+                esc: listaSesiones[idSesion].escenarios[indexEsc],
+                hor: listaSesiones[idSesion].escenarios[indexEsc].hh,
+                mi: listaSesiones[idSesion].escenarios[indexEsc].mm,
+                se: listaSesiones[idSesion].escenarios[indexEsc].ss,
                 hr_finish: hr_finish,
-                n: listaSesiones[idSesion].escenarios[req.params.indexEsc].cont,
+                n: listaSesiones[idSesion].escenarios[indexEsc].cont,
                 nocreador: nocreador,
-                namePart: namePart
+                namePart: namePart,
+                tiempo_extra: tiempo_extra,
+                editar: req.body.editar,
+                moderador: listaSesiones[idSesion].moderador
             });
 
         });
@@ -633,61 +463,34 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var idSesion = parseInt(decrypt(String(req.params.idSesion), crypto));
         var idPart = parseInt(decrypt(String(req.params.idPart), crypto));
         var indexEsc = parseInt(req.params.indexEsc);
-        console.log("PRIORIDAD: ",req.body.prioridad);
-        console.log(req.body.ids);
         listaSesiones[idSesion].inicio = false;
         escenarioActual = (listaSesiones[idSesion].escenarios)[indexEsc];
-        // cambie lang por dec
+        for (var i = escenarioActual.votos.length-1; i >= 0; i--) {
+            console.log("EN EL FOR PA ELIMINAR WEAS: ", escenarioActual.votos[i].idParticipante, idPart);
+            if (escenarioActual.votos[i].idParticipante === idPart) {
+                console.log("SE ESTAN ELIMINANDO WEAS!");
+                escenarioActual.votos.splice(i, 1);
+            }
+        }
         req.body.ids.forEach(function (idDecision) {
-            console.log(idDecision, req.body.prioridad[idDecision-1]);
-            escenarioActual.crearVoto(req.body.prioridad[idDecision-1], idDecision,idPart);
+            //////// AQUI SE GUARDAN LOS VOTOS EN LA BASE DE DATOS ///////////
+            //escenarioActual.crearVoto(req.body.prioridad[idDecision-1],idDecision,idPart);
+            //////////// HAY QUE HACERLO EN OTRA PARTE GGWP /////////////
+            //////////////////////////////////////////////////////////////////
             escenarioActual.votos.push({
                 prioridad: req.body.prioridad[idDecision-1],
                 idDecision: idDecision,
                 idParticipante: idPart
             });
         });
-        console.log(escenarioActual.votos);
-        res.render('mandarDecisiones.html',
-            {
-                username: req.params.username,
-                idSesion: idSesion,
-                idSesionEnc: req.params.idSesion,
-                idPart: idPart,
-                idPartEnc: req.params.idPart,
-                indexEsc: req.params.indexEsc
-            });
-    });
-
-    /////////////////esperandoo////////////////////7
-    app.post('/sesion/escenario/esperando/:idSesion/:indexEsc/:idPart/:username', function (req, res) {
-        var idSesion = parseInt(decrypt(String(req.params.idSesion), crypto));
-        var idPart = parseInt(decrypt(String(req.params.idPart), crypto));
-        var indexEsc = parseInt(req.params.indexEsc);
-        var names_conectados = [];
-        for (i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
-            if (listaSesiones[idSesion].conectados[i].username != req.params.username)
-                names_conectados.push(listaSesiones[idSesion].conectados[i].username);
-        }
-        escenarioActual = (listaSesiones[idSesion].escenarios)[indexEsc];
-        var creador = false;
-        if (parseInt(listaSesiones[idSesion].moderador) === parseInt(idPart)) {
-            creador = true;
-        }
         indexEsc = parseInt(indexEsc)+1;
         if (indexEsc <= listaSesiones[idSesion].escenarios.length) {
-            res.render('esperando.html', {
-                names: names_conectados,
-                noresultado: false,
+            res.render('mandarDecisiones.html', {
                 username: req.params.username,
-                idSesion: idSesion,
                 idSesionEnc: req.params.idSesion,
-                creador: creador,
-                idPart: idPart,
                 idPartEnc: req.params.idPart,
                 indexEsc: indexEsc,
                 inicio: listaSesiones[idSesion].inicio,
-                revisados: listaSesiones[idSesion].escenarios[indexEsc-1].revisados,
                 ver_resultado: listaSesiones[idSesion].escenarios.ver_resultado
             });
         } else {
@@ -699,6 +502,23 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var aux = {};
         var contVotos = {};
         var VotosporPar = {};
+        var cant_dec = {};
+        var cant_dec1 = {};
+        var cant_dec2 = {};
+        var cant_dec3 = {};
+        var dec_aux = [];
+        var dec_aux1 = [];
+        var dec_aux2 = [];
+        var dec_aux3 = [];
+        var cant_dec_tot = [];
+        var cant_dec1_tot = [];
+        var cant_dec2_tot = [];
+        var cant_dec3_tot = [];
+        var dec_todos_alta = [];
+        var dec_todos_media = [];
+        var dec_todos_media_alta = [];
+        var dec_todos_no_selec = [];
+        var index = [];
         for(i = 0; i < listaDecisiones.length; i++) {
             contVotos[listaDecisiones[i].dataValues.id] = 0;
         }
@@ -706,6 +526,9 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var idPart = parseInt(decrypt(String(req.params.idPart), crypto));
         var indexEsc = parseInt(req.params.indexEsc);
         var votosEsc = listaSesiones[idSesion].escenarios[indexEsc-1].votos;
+        var num_part = listaSesiones[idSesion].participantes.length;
+        console.log("VER AQUI",votosEsc);
+
         listaSesiones[idSesion].escenarios.ver_resultado = true;
         var creador = false;
         if (parseInt(listaSesiones[idSesion].moderador) === parseInt(idPart)) {
@@ -737,7 +560,6 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         if (parseInt(indexEsc) === parseInt(listaSesiones[idSesion].escenarios.length))
             bool_result_final[1] = true;
         var contFinal = [];
-
         for(key in contVotos){
             contFinal.push({name: key, y: contVotos[key]})
         }
@@ -747,8 +569,9 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             resultado_final.push(contFinal);
         }
 
-        F = []; /*F=[[nombrePart1, [[dec1,prioridad],[dec2,prioridad],...]],
-                    [nombrePart2, [[dec1,prioridad],[dec2,prioridad],...]]]*/
+
+        F = []; /*F=[[nombrePart1,[[dec1,prioridad],[dec2,prioridad],...]],
+                [nombrePart2,[[dec1,prioridad],[dec2,prioridad],...]]]*/
         for (idPart in VotosporPar){
             aux = [];
             aux2 = [];
@@ -771,12 +594,107 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
 
             F.push(aux);
         }
-        resultados[indexEsc-1] = F;
-        console.log(F);
-        console.log(resultado_final);
-        console.log(resultados);
+        resultados[indexEsc - 1] = F;
 
+        for (Part in resultados[indexEsc-1])
+        {
+            for (dec in resultados[indexEsc-1][Part][1])
+            {
+                if (resultados[indexEsc-1][Part][1][dec][1] == "Alta")
+                {
+                    if (resultados[indexEsc-1][Part][1][dec][0] in cant_dec) cant_dec[resultados[indexEsc-1][Part][1][dec][0]]++;
+                    else cant_dec[resultados[indexEsc-1][Part][1][dec][0]] = 1;
+
+                    if (resultados[indexEsc-1][Part][1][dec][0] in cant_dec2) cant_dec2[resultados[indexEsc-1][Part][1][dec][0]]++;
+                    else cant_dec2[resultados[indexEsc-1][Part][1][dec][0]] = 1;
+                }
+                if (resultados[indexEsc-1][Part][1][dec][1] == "Media")
+                {
+                    if (resultados[indexEsc-1][Part][1][dec][0] in cant_dec1) cant_dec1[resultados[indexEsc-1][Part][1][dec][0]]++;
+                    else cant_dec1[resultados[indexEsc-1][Part][1][dec][0]] = 1;
+
+                    if (resultados[indexEsc-1][Part][1][dec][0] in cant_dec2) cant_dec2[resultados[indexEsc-1][Part][1][dec][0]]++;
+                    else cant_dec2[resultados[indexEsc-1][Part][1][dec][0]] = 1;
+                }
+                if (resultados[indexEsc-1][Part][1][dec][1] == "No Seleccionada")
+                {
+                    if (resultados[indexEsc-1][Part][1][dec][0] in cant_dec3) cant_dec3[resultados[indexEsc-1][Part][1][dec][0]]++;
+                    else cant_dec3[resultados[indexEsc-1][Part][1][dec][0]] = 1;
+
+                }
+
+            }
+        }
+        for (dec in cant_dec)
+        {
+            if (cant_dec[dec] == num_part) dec_aux.push(dec);
+        }
+        dec_todos_alta.push([indexEsc-1,dec_aux]);
+
+        for (dec in cant_dec1)
+        {
+            if (cant_dec1[dec] == num_part) dec_aux1.push(dec);
+        }
+        dec_todos_media.push([indexEsc-1,dec_aux1]);
+
+        for (dec in cant_dec2)
+        {
+            if (cant_dec2[dec] == num_part) dec_aux2.push(dec);
+        }
+        dec_todos_media_alta.push([indexEsc-1,dec_aux2]);
+
+        for (dec in cant_dec3)
+        {
+            if (cant_dec3[dec] == num_part) dec_aux3.push(dec);
+        }
+        dec_todos_no_selec.push([indexEsc-1,dec_aux3]);
+
+        var Aux = [];
+        for(key in cant_dec){
+            Aux.push({name: key, y: cant_dec[key]})
+        }
+        cant_dec_tot.push(Aux);
+
+        Aux = [];
+        for(key in cant_dec1){
+            Aux.push({name: key, y: cant_dec1[key]})
+        }
+        cant_dec1_tot.push(Aux);
+
+        Aux = [];
+        for(key in cant_dec2){
+            Aux.push({name: key, y: cant_dec2[key]})
+        }
+        cant_dec2_tot.push(Aux);
+
+        Aux = [];
+        for(key in cant_dec3){
+            Aux.push({name: key, y: cant_dec3[key]})
+        }
+        cant_dec3_tot.push(Aux);
+
+        index.push(indexEsc-1);
+
+        cant_dec_tot.stringify = JSON.stringify(cant_dec_tot);
+        cant_dec1_tot.stringify = JSON.stringify(cant_dec1_tot);
+        cant_dec2_tot.stringify = JSON.stringify(cant_dec2_tot);
+        cant_dec3_tot.stringify = JSON.stringify(cant_dec3_tot);
+        index.stringify = JSON.stringify(index);
+        var names_conectados = [];
+        for (var i = 0; i < listaSesiones[idSesion].conectados.length; i++) {
+            if (listaSesiones[idSesion].conectados[i].username !== req.params.username)
+                names_conectados.push(listaSesiones[idSesion].conectados[i].username);
+        }
         res.render('resultadoEsc.html', {
+            names: names_conectados,
+            revisados: listaSesiones[idSesion].escenarios[indexEsc-1].revisados,
+            probando1: cant_dec_tot,
+            probando2: cant_dec1_tot,
+            probando3: cant_dec2_tot,
+            probando4: cant_dec3_tot,
+            altas: dec_todos_alta,
+            medias: dec_todos_media ,
+            altas_medias: dec_todos_media_alta,
             VotosporPart: F,
             probando: contFinal,
             username: req.params.username,
@@ -788,6 +706,7 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             inicio: listaSesiones[idSesion].inicio,
             result_final: bool_result_final[1],
             result_final_part: bool_result_final[2],
+            idx: index
         });
     });
 
@@ -796,20 +715,168 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
         var idPart = parseInt(decrypt(String(req.params.idPart), crypto));
         var indexEsc = parseInt(req.params.indexEsc);
         var creador = false;
+        var dec_todos_alta = []; // = [[indexEsc1,[dec1, dec3]],... ]
+        var dec_todos_media = [];
+        var dec_todos_media_alta = [];
+        var dec_todos_no_selec = [];
+        var cant_dec = {}; // = {dec1: 1, dec2: 3, dec3: 3} si num_part = 3, dec2 y dec3 van. Alta
+        var cant_dec1 = {}; //Media
+        var cant_dec2 = {}; //Media - Alta
+        var cant_dec3 = {}; //No Selec
+        var cant_dec_tot = []; // [[indexEsc1,cant_dec1],...]
+        var cant_dec1_tot = [];
+        var cant_dec2_tot = [];
+        var cant_dec3_tot = [];
+        var dec_aux = []; //dec que han sido votadas por todos, prioridad alta
+        var dec_aux1 = []; //dec que han sido votadas por todos, prioridad media
+        var dec_aux2 = []; //dec que han sido votadas por todos, prioridad alta-media
+        var dec_aux3 = []; //dec que han sido votadas por todos, prioridad no selec
+        var num_part = listaSesiones[idSesion].participantes.length;
+        var esc = [];
+        var index = [];
+
+        /////////// GUARDANDO EN LA BD LOS VOTOS ///////////////
+        if (indexEsc !== 0) {
+            console.log("GUARDANDOOOOOOOOOOOOOOOOOOOO!!!");
+            listaSesiones[idSesion].escenarios[indexEsc-1].votos.forEach(function(voto) {
+                listaSesiones[idSesion].escenarios[indexEsc-1].crearVoto(voto.prioridad, voto.idDecision ,voto.idParticipante);
+            });
+        }
+
+        console.log("AQUIIIIII",req.body.escenarios);
+        if (req.body.escenarios === undefined) index.push("1");
+        else index.push(req.body.escenarios);
+        for (var i = 0; i < listaSesiones[idSesion].escenarios.length; i++)
+        {
+            esc.push(i+1);
+        }
+
+        /*  resultados={"0": F_1,"1"; F_2,..}
+            F_n=[[nombrePart1,[[dec1,prioridad],[dec2,prioridad],...]],
+                [nombrePart2,[[dec1,prioridad],[dec2,prioridad],...]]]*/
+
+        for (idx in resultados)
+        {
+            cant_dec = {};
+            cant_dec1 = {};
+            cant_dec2 = {};
+            cant_dec3 = {};
+            dec_aux = [];
+            dec_aux1 = [];
+            dec_aux2 = [];
+            dec_aux3 = [];
+            for (Part in resultados[idx])
+            {
+                for (dec in resultados[idx][Part][1])
+                {
+                    if (resultados[idx][Part][1][dec][1] == "Alta")
+                    {
+                        if (resultados[idx][Part][1][dec][0] in cant_dec) cant_dec[resultados[idx][Part][1][dec][0]]++;
+                        else cant_dec[resultados[idx][Part][1][dec][0]] = 1;
+
+                        if (resultados[idx][Part][1][dec][0] in cant_dec2) cant_dec2[resultados[idx][Part][1][dec][0]]++;
+                        else cant_dec2[resultados[idx][Part][1][dec][0]] = 1;
+                    }
+                    if (resultados[idx][Part][1][dec][1] == "Media")
+                    {
+                        if (resultados[idx][Part][1][dec][0] in cant_dec1) cant_dec1[resultados[idx][Part][1][dec][0]]++;
+                        else cant_dec1[resultados[idx][Part][1][dec][0]] = 1;
+
+                        if (resultados[idx][Part][1][dec][0] in cant_dec2) cant_dec2[resultados[idx][Part][1][dec][0]]++;
+                        else cant_dec2[resultados[idx][Part][1][dec][0]] = 1;
+                    }
+                    if (resultados[idx][Part][1][dec][1] == "No Seleccionada")
+                    {
+                        if (resultados[idx][Part][1][dec][0] in cant_dec3) cant_dec3[resultados[idx][Part][1][dec][0]]++;
+                        else cant_dec3[resultados[idx][Part][1][dec][0]] = 1;
+                    }
+
+                }
+            }
+            for (dec in cant_dec)
+            {
+                if (cant_dec[dec] == num_part) dec_aux.push(dec);
+            }
+            dec_todos_alta.push([idx,dec_aux]);
+
+            for (dec in cant_dec1)
+            {
+                if (cant_dec1[dec] == num_part) dec_aux1.push(dec);
+            }
+            dec_todos_media.push([idx,dec_aux1]);
+
+            for (dec in cant_dec2)
+            {
+                if (cant_dec2[dec] == num_part) dec_aux2.push(dec);
+            }
+            dec_todos_media_alta.push([idx,dec_aux2]);
+
+            for (dec in cant_dec3)
+            {
+                if (cant_dec3[dec] == num_part) dec_aux3.push(dec);
+            }
+            dec_todos_no_selec.push([idx,dec_aux3]);
+
+            var aux = [];
+            for(key in cant_dec){
+                aux.push({name: key, y: cant_dec[key]})
+            }
+            cant_dec_tot.push(aux);
+
+            aux = [];
+            for(key in cant_dec1){
+                aux.push({name: key, y: cant_dec1[key]})
+            }
+            cant_dec1_tot.push(aux);
+
+            aux = [];
+            for(key in cant_dec2){
+                aux.push({name: key, y: cant_dec2[key]})
+            }
+            cant_dec2_tot.push(aux);
+
+            aux = [];
+            for(key in cant_dec3){
+                aux.push({name: key, y: cant_dec3[key]})
+            }
+            cant_dec3_tot.push(aux);
+
+
+
+        }
         if (parseInt(listaSesiones[idSesion].moderador) === parseInt(idPart)) {
             creador = true;
-            console.log("SOYYYYYYYY POKIIIIIIIIII!");
         }
+        cant_dec_tot.stringify = JSON.stringify(cant_dec_tot);
+        cant_dec1_tot.stringify = JSON.stringify(cant_dec1_tot);
+        cant_dec2_tot.stringify = JSON.stringify(cant_dec2_tot);
+        cant_dec3_tot.stringify = JSON.stringify(cant_dec3_tot);
+        dec_todos_alta.stringify = JSON.stringify(dec_todos_alta);
+        dec_todos_media.stringify = JSON.stringify(dec_todos_media);
+        dec_todos_media_alta.stringify = JSON.stringify(dec_todos_media_alta);
+        index.stringify = JSON.stringify(index);
+
+
         resultado_final.stringify = JSON.stringify(resultado_final);
         res.render('resultadoFinal.html', {
-            probando: resultado_final,
+            probando: cant_dec_tot,
+            probando1: cant_dec1_tot,
+            probando2: cant_dec2_tot,
+            probando3: cant_dec3_tot,
+            cant_dec: cant_dec,
+            todos_alta: dec_todos_alta,
+            todos_media: dec_todos_media,
+            todos_media_alta: dec_todos_media_alta,
+            res_final: resultado_final,
             username: req.params.username,
             idSesionEnc: req.params.idSesion,
             idPartEnc: req.params.idPart,
-            indexEsc: indexEsc,
+            indexEsc: indexEsc  ,
             creador: creador,
             inicio: listaSesiones[idSesion].inicio,
-            result_final: bool_result_final[1]
+            result_final: bool_result_final[1],
+            esc: esc,
+            idx: index
         });
     });
 }

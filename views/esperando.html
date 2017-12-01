@@ -4,11 +4,35 @@
     <link rel="stylesheet" href="/public/css/bootstrap.css" />
     <link rel="stylesheet" href="/public/css/style.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-    <script src="/controllers/sesionCtrl.js"></script>
+    <script src="/controllers/resultadoCtrl.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <style>
+        .vertical{
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 18%;
+        }
+        .vertical-scroll {
+            position: fixed;
+            left: 1%;
+            top: 0;
+            height: 90%;
+            width: 18%;
+            overflow:auto;
+            word-break:break-all;
+        }
+        .bot {
+            position: fixed;
+            bottom: 3%;
+            left: 1%;
+        }
+    </style>
 </head>
 <%- include("layout.html"); %>
-<body ng-app="sesion" ng-controller="sesionCtrl">
+<body ng-app="resultado" ng-controller="esperando">
+    {{1+2}}
     <script>
         var socket = io.connect(window.location.host);
         socket.on('start',function (data) {
@@ -22,6 +46,27 @@
             counter.innerHTML += data.namePart + " ya envió sus decisiones <br>";
         });
     </script>
+
+    <div class="vertical">
+        <div id="counter"></div>
+        <div id="mario-chat">
+            <div  class="vertical-scroll" id="chat">
+                <div id="chat-window">
+                    <div id="output"></div>
+                </div>
+                <input type="hidden" id="handle" value="<%= username %>">
+                <input type="hidden" id="idSesion" value="<%= idSesion %>">
+            </div>
+            <div class="bot">
+                <%= username %>: <input id="message" type="text" placeholder="Message" onkeypress="myFunction(event)">
+                <button id="send">Send</button>
+            </div>
+        </div>
+        <br><br>
+        <script src="/public/js/cliente.js"></script>
+        <script src="/public/js/moderador.js"></script>
+    </div>
+
     <div class="col-md-4 col-md-offset-4">
         Conectados: <br>
         <% names.forEach(function(nombre) { %>
@@ -36,25 +81,11 @@
                 <%= r  %> ya envió sus decisiones <br>
             <% }); %>
         <% } %>
-        <div id="counter"></div>
-        <div id="mario-chat">
-            <div id="chat-window">
-                <div id="output"></div>
-            </div>
-            <input type="hidden" id="handle" value="<%= username %>">
-            <input type="hidden" id="idSesion" value="<%= idSesion %>">
-            <%= username %>: <input id="message" type="text" placeholder="Message" onkeypress="myFunction(event)">
-            <button id="send">Send</button>
-        </div>
-        <br><br>
-        <script src="/public/js/cliente.js"></script>
-        <script src="/public/js/moderador.js"></script>
 
         <% if (noresultado) { %>
             <% if (creador) { %>
                 <form method="post" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-                    <input type="hidden" id="iniciar" value="<%= idSesion %>">
-                    <input type="hidden" id="handle" value="<%= username %>">
+                    <input type="hidden" name="editar" value="false">
                     <button type="submit" id = "iniciar_sesion" class="btn btn-lg btn-info">Iniciar sesión</button>
                 </form>
                 <script src="/public/js/start.js"></script>
@@ -62,16 +93,13 @@
 
             <% if (inicio) { %>
                 <form method="post" name ="inicio" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-                    <input type="hidden" id="iniciar" value="<%= idSesion %>">
-                    <input type="hidden" id="handle" value="<%= username %>">
+                    <input type="hidden" name="editar" value="false">
                     <body onload = "document.inicio.submit();"></body>
                 </form>
             <% } %>
         <% } else { %>
             <% if (creador) { %>
                 <form method="post" action="/sesion/escenario/resultado/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-                    <input type="hidden" id="iniciar" value="<%= idSesion %>">
-                    <input type="hidden" id="handle" value="<%= username %>">
                     <button type="submit" id = "mostrar_resultados" class="btn btn-lg btn-info">Mostrar Resultados</button>
                 </form>
                 <script >
@@ -85,16 +113,12 @@
 
             <% if (ver_resultado) { %>
                 <form method="post" name = "result" action="/sesion/escenario/resultado/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-                    <input type="hidden" id="iniciar" value="<%= idSesion %>">
-                    <input type="hidden" id="handle" value="<%= username %>">
                     <body onload = "document.result.submit();"></body>
                 </form>
             <% } %>
 
             <% if (inicio) { %>
                 <form method="post" name ="inicio" action="/sesion/escenario/resultado/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-                    <input type="hidden" id="iniciar" value="<%= idSesion %>">
-                    <input type="hidden" id="handle" value="<%= username %>">
                     <body onload = "document.inicio.submit();"></body>
                 </form>
             <% } %>

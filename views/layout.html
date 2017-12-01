@@ -12,8 +12,13 @@
         <nav>
             <ul class="nav nav-pills pull-right">
                 <li role="presentation"><a href="/">Inicio</a></li>
+                <% if (!locals.user) { %>
                 <li role="presentation"><a href="/login">Iniciar Sesion</a></li>
                 <li role="presentation"><a href="/registro">Regístrate</a></li>
+                <% } %>
+                <% if (locals.user) { %>
+                <li role="presentation"><a href="/logout">Salir</a></li>
+                <% } %>
             </ul>
         </nav>
         <h3 class="text-muted">I.T. Force</h3>

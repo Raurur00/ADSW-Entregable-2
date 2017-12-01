@@ -1,9 +1,10 @@
-var socket = io.connect(window.location.host);
-var message = document.getElementById('message'),
+var socket = io.connect(window.location.host),
+    message = document.getElementById('message'),
     handle = document.getElementById('handle'),
     btn = document.getElementById('send'),
-    output = document.getElementById('output');
-    test = document.getElementById('test');
+    output = document.getElementById('output'),
+    test = document.getElementById('test'),
+    chat = document.getElementById('chat');
 
 socket.emit('conectado', {
     username: handle.value,
@@ -27,6 +28,11 @@ btn.addEventListener('click',function () {
 //Listen for events
 socket.on('chat',function (data) {
     output.innerHTML += '<p><strong>'+ data.handle + ': </strong>'+data.message+'</p>';
+    chat.scrollTop = chat.scrollHeight;
+});
+
+socket.on('online',function (data) {
+    test.innerHTML += data.username + "<br>";
 });
 
 //enviar mensaje al presionar enter y borrarlo después
@@ -40,7 +46,3 @@ function myFunction(event) {
         message.value = "";
     }
 }
-
-socket.on('online',function (data) {
-    test.innerHTML += data.username + "<br>";
-});

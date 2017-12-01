@@ -4,51 +4,29 @@
     <link rel="stylesheet" href="/public/css/bootstrap.css" />
     <link rel="stylesheet" href="/public/css/style.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-    <script src="/controllers/sesionCtrl.js"></script>
+    <script src="/node_modules/angular-sanitize/angular-sanitize.js"></script>
+    <script src = "/node_modules/angular-xslt/src/ng-xslt.js"></script>
+    <script src="/controllers/decisionesCtrl.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="/public/js/dragAndDrop.js"></script>
+
 
 </head>
 <%- include("layout.html"); %>
-<body ng-app="sesion" ng-controller="sesionCtrl">
+<body ng-app="sesion" ng-controller="decisiones">
     <div class="col-md-4 col-md-offset-4">
         <div id="counter"></div>
         Escenario: <%= esc.objetivo %><br>
         Index: <%= indexEsc %><br>
-        holaaaaaaa <%= username %>
+        holaaaaaaa <%= username %><br>
         <form method="post" action="/sesion/escenario/mandar_decisiones/<%= idSesionEnc %>/<%=indexEsc %>/<%= idPartEnc %>/<%= username %>">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th> </th>
-                    <th> Nombre </th>
-                    <th> Mecanismo </th>
-                    <th> Resultado </th>
-                </tr>
-                </thead>
-                <% dec.forEach(function(decision) { %>
-                    <tbody>
-                    <td><input type="hidden" name="ids[]" value="<%= decision.id %>"></td>
-                    <td><%= decision.nombre %></td>
-                    <td><%= decision.mecanismo %></td>
-                    <td><%= decision.resultado %></td>
-                    <td><select name="prioridad">
-                        <option value="Alta">Alta</option>
-                        <option value="Media">Media</option>
-                        <option value="Baja">Baja</option>
-                        <option value="No Seleccionada">No Seleccionada</option>
-                    </select></td>
-                    </tbody>
-                <% }); %>
-
-            </table>
-            <button type="submit" id = "resultado" class="btn btn-default"> Enviar</button>
+            <div ng-bind-html="'<%= dec%>' | xslt:decXslt | html"></div>
         </form>
 
         <script> var socket = io.connect(window.location.host);
 
         var counter = document.getElementById('counter');
         resultado = document.getElementById('resultado');
+
 
         var x = setInterval(function() {
 
@@ -57,6 +35,7 @@
 
             // Find the distance between now an the count down date
             var distance = "<%= hr_finish %>" - now;
+            if ("<%= editar %>" == "true") distance = "<%= tiempo_extra %>" - now;
 
             // Time calculations for days, hours, minutes and seconds
             var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -84,11 +63,19 @@
             if (distance < 0) {
                 clearInterval(x);
                 document.getElementById("counter").innerHTML = "SE ACABO DEL TIEMPO";
+                socket.emit("time_over",{
+                    idPart: "<%= idPart %>",
+                    idSesion: "<%= idSesion %>"
+                });
             }
         }, 1000);
 
         // Output the result in an element with id="demo"
 
+        socket.on('time_over', function (data){
+            if (parseInt("<%= idPart %>") === parseInt("<%= moderador %>"))
+                alert("oe se acabo del tiempo zi");
+        });
 
         console.log('iniciando timer..');
         socket.emit('iniciar',{
@@ -113,10 +100,6 @@
         });
 
         socket.on('resultado',function (data) {
-        });
-
-        socket.on('timer',function (data) {
-            document.getElementById("counter").innerHTML += "\n" ;
         });
 
         </script>

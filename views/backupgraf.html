@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<% todos_alta.forEach(function(esc) { %>
+Escenario <%= esc[0] %>:
+<% esc[1].forEach(function(dec) { %>
+<%= dec %><br>
+|   <% }); %>
+<% }); %>
+
+<script src="/public/js/Chart.min.js"></script>
+<body>
+<canvas id="chart1" width="1000" height="200"></canvas>
+<script>
+    var ctx = document.getElementById("chart1");
+    var data = {
+            labels: <%-JSON.stringify(test1) %>,
+        datasets: [{
+        label: '# Numero de votos',
+        data: <%-JSON.stringify(test2) %>,
+        backgroundColor: [
+        'rgba(100, 100, 100, 0.25)',
+        'rgba(100, 100, 100, 0.25)',
+        'rgba(100, 100, 100, 0.25)',
+    ],
+        borderColor: [
+        'rgba(200,200,200,1)',
+        'rgba(200,200,200,1)',
+        'rgba(200,200,200,1)',
+    ],
+        borderWidth: 2
+    },
+    {
+        label: '# Dias de uso Febrero',
+            data: [20, 20, 20],
+        backgroundColor: [
+        'rgba(100, 100, 200, 0.25)',
+        'rgba(100, 100, 200, 0.25)',
+        'rgba(100, 100, 200, 0.25)',
+    ],
+        borderColor: [
+        'rgba(200,200,255,1)',
+        'rgba(200,200,255,1)',
+        'rgba(200,200,255,1)',
+    ],
+        borderWidth: 2
+    }
+    ]
+    };
+    var options = {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    };
+    var chart1 = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: options
+    });
+</script>
+</body>
+</html>

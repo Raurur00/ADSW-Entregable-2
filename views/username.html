@@ -14,8 +14,8 @@
         <% if (creador) {%>
             <form method="post" action="/sesion/mod/iniciando/<%= idSesionEnc %>/<%= emailInvEnc %>">
                 <div class="form-group">
-                    <label>username</label>
-                    <input id= "text1" name="username" type="text" class="form-control" placeholder="Username">
+                    <label>Nombre</label>
+                    <input id="text1" type="text" class="form-control" placeholder="Username" name="username">
                 </div>
                 <button name="submit" type="submit" class="btn btn-default">submit</button>
             </form>
@@ -23,7 +23,7 @@
             <form method="post" action="/sesion/part/iniciando/<%= idSesionEnc %>/<%= emailInvEnc %>">
                 <div class="form-group">
                     <label>username</label>
-                    <input id= "text2" name="username" type="text" class="form-control" placeholder="Username">
+                    <input id="text2" type="text" class="form-control" placeholder="Username" name="username">
                 </div>
                 <button name="submit" type="submit" class="btn btn-default">Comenzar sesión</button>
             </form>
@@ -49,7 +49,5 @@
                 });
             });
     }
+</script>
 
-
-
-                </script>

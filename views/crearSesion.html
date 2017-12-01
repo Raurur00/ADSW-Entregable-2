@@ -4,66 +4,66 @@
     <link rel="stylesheet" href="/public/css/bootstrap.css" />
     <link rel="stylesheet" href="/public/css/style.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="/controllers/angular-local-storage.min.js"></script>
     <script src = "/node_modules/angular-xslt/src/ng-xslt.js"></script>
-    <script src="/controllers/sesionCtrl.js"></script>
+    <script src="/controllers/crearSesionCtrl.js"></script>
 </head>
+
 <%- include("layout.html"); %>
+
 <body ng-app="sesion" ng-controller="crearSesion">
     <div class="col-md-4 col-md-offset-4">
         <h2 class="page-header">Creando el Juego!</h2>
 
-        <% if (errors) { %>
-        <% errors.forEach(function(error){ %>
-            <div class="alert alert-danger"><%= error.msg %></div>
-        <% }); %>
-        <% } %>
+        <div ng-if="variables.invRepetido" class="alert alert-danger">Ya invitaste a esa persona uwu</div>
+        <div ng-if="variables.escRepetido" class="alert alert-danger">Ya agregaste ese escenario uwu</div>
 
-        <% if (propio) { %>
-            <div class="alert alert-danger">No puedes invitarte a ti mismo</div>
-        <% } %>
-        <% if (repetido) { %>
-            <div class="alert alert-danger">Ya invitaste a esa persona</div>
-        <% } %>
-        <% if (notiempo) { %>
-            <div class="alert alert-danger">No pusiste tiempo al escenario</div>
-        <% } %>
-        <% if (escrepetido) { %>
-            <div class="alert alert-danger">Ya tienes ese escenario</div>
-        <% } %>
-        <% if (noesc) { %>
-            <div class="alert alert-danger">Debes tener escenarios antes de comenzar la sesión</div>
-        <% } %>
-        <% if (noinv) { %>
-            <div class="alert alert-danger">Debes invitar personas antes de comenzar la sesión</div>
-        <% } %>
-
-        <form method="post" action="/crear_sesion/<%= idSesionEnc %>">
+        <form name = "INV">
             <label>Invitados</label><br>
-            <div ng-bind-html="html"></div>
+            <li ng-repeat="invitado in variables.invitados">
+                {{invitado}}<br>
+            </li>
             <div class="form-group">
-                <input type="text" class="form-control" placeholder="escribe el email de tu invitado aquí" name="email">
+                <input type="email" ng-model="variables.nuevoInvitado" class="form-control" placeholder="escribe el email de tu invitado aquí" name="email" required>
             </div>
-
-            <button type="submit" class="btn btn-default" formaction="/crear_sesion/invitar/<%= idSesionEnc %>">Invitar</button>
-            <br><br>
-
-            <label>Escenarios</label><br>
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="escribe el objetivo de tu escenario aqui" name="esc">
-            </div>
-            <div class="col-sm-2">
-                <input type="text" class="form-control" placeholder="hh" name="hh">
-            </div>
-            <div class="col-sm-2">
-                <input type="text" class="form-control" placeholder="mm" name="mm">
-            </div>
-            <div class="col-sm-2">
-                <input type="text" class="form-control" placeholder="ss" name="ss">
-            </div>
-            <button type="submit" class="btn btn-default" formaction="/crear_sesion/esc/<%= idSesionEnc %>">Agregar Escenario</button>
-            <br><br>
-            <button type="submit" class="btn btn-default">Iniciar Juego!</button>
+            <button ng-if="INV.email.$valid" ng-click="agregarInvitado()" class="btn btn-default">Invitar</button><br><br>
         </form>
+
+
+
+        <form name = "ESC">
+            <label>Escenarios</label><br>
+            <li ng-repeat="esc in variables.escenarios">
+                {{esc.obj}} {{esc.hh}} hora(s), {{esc.mm}} minuto(s) {{esc.ss}} segundo(s)<br>
+            </li>
+            <div class="form-group">
+                <input type="text" ng-model="variables.nuevoEsc.obj" class="form-control" placeholder="Escribe el objetivo de tu escenario aquí" name="obj" required>
+            </div>
+            <div class="col-sm-3">
+                Tiempo:
+            </div>
+            <div class="col-sm-3">
+                <input type="number" ng-model="variables.nuevoEsc.hh" class="form-control" name="hh" required>
+            </div>
+            <div class="col-sm-3">
+                <input type="number" ng-model="variables.nuevoEsc.mm" class="form-control"  name="mm" required>
+            </div>
+            <div class="col-sm-3">
+                <input type="number" ng-model="variables.nuevoEsc.ss" class="form-control" name="ss" required>
+            </div> <br>
+            <button ng-if="ESC.obj.$valid && ESC.hh.$valid && ESC.mm.$valid && ESC.ss.$valid"
+                    ng-click="agregarEsc()" class="btn btn-default">Agregar escenario</button><br><br>
+        </form>
+
+
+        <form  method="post" action="/crear_sesion/<%= idSesionEnc %>">
+            <input type="hidden" name="invitados" value={{variables.invitados}}>
+            <input type="hidden" name="escenarios" value={{variables.escenarios}}>
+            <br>
+            <button ng-click="finalizar()" ng-if="variables.invitados.length != 0 && variables.escenarios.length != 0"
+                    type="submit" class="btn btn-default">Iniciar Juego!</button>
+        </form>
+
     </div>
 </body>
 </html>

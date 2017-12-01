@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "angular": "~1.5.8",
+    "angular-xslt": "^0.2.1",
     "bcrypt-nodejs": "0.0.3",
     "bcryptjs": "*",
     "body-parser": "~1.15.2",
@@ -22,6 +23,7 @@
     "fs": "0.0.1-security",
     "html": "^1.0.0",
     "ip": "^1.1.5",
+    "jsontoxml": "^0.1.0",
     "method-override": "~2.3.6",
     "morgan": "~1.7.0",
     "mysql": "^2.5.4",

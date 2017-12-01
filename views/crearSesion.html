@@ -4,12 +4,11 @@
     <link rel="stylesheet" href="/public/css/bootstrap.css" />
     <link rel="stylesheet" href="/public/css/style.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src = "/node_modules/angular-xslt/src/ng-xslt.js"></script>
     <script src="/controllers/sesionCtrl.js"></script>
-
-
 </head>
 <%- include("layout.html"); %>
-<body ng-app="sesion" ng-controller="sesionCtrl">
+<body ng-app="sesion" ng-controller="crearSesion">
     <div class="col-md-4 col-md-offset-4">
         <h2 class="page-header">Creando el Juego!</h2>
 
@@ -40,9 +39,7 @@
 
         <form method="post" action="/crear_sesion/<%= idSesionEnc %>">
             <label>Invitados</label><br>
-            <% invitados.forEach(function(invitado){ %>
-                <%= invitado.email %><br>
-            <% }) %>
+            <div ng-bind-html="html"></div>
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="escribe el email de tu invitado aquí" name="email">
             </div>
@@ -51,9 +48,6 @@
             <br><br>
 
             <label>Escenarios</label><br>
-            <% escenarios.forEach(function(esc){ %>
-                <%= esc.objetivo%> <%= esc.hh%> hora/s, <%= esc.mm%> minuto/s, <%= esc.ss%> segundo/s<br>
-            <% }) %>
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="escribe el objetivo de tu escenario aqui" name="esc">
             </div>

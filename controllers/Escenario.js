@@ -34,8 +34,9 @@ module.exports = function Escenario(objetivo,hh,mm,ss,sesionID){
         });
     };
 
-    this.crearVoto = function(idDecision,idParticipante){
+    this.crearVoto = function(prioridad, idDecision,idParticipante){
         models.Voto.create({
+            prioridad: prioridad,
             DecisionId: idDecision,
             EscenarioId: this.id,
             ParticipanteId: idParticipante

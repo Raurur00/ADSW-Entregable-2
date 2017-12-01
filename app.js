@@ -11,6 +11,9 @@ var session      = require('express-session');
 var expressValidator = require('express-validator');
 var nodemailer = require("nodemailer");
 var crypto = require('crypto');
+var jsontoxml = require('jsontoxml');
+var lista_sockets = {};
+var resultados = {};
 var listaSesiones={};
 var listaDecisiones=null;
 var logueados = {};
@@ -22,7 +25,6 @@ var bool_result_final = [-1,false, false, true]; /*[0] index del grafico por esc
                                              [3] que no se vuelvan a cargar resultados al
                                               recargar la pagina
                                               [4] juntar los graficos*/
-
 // Init App
 var app = express();
 
@@ -90,7 +92,8 @@ app.use(nodeadmin(app));
 
 
 //Routes
-require('./router/routes.js')(app, passport, nodemailer, crypto, listaSesiones,listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final); // load our routes and pass in our app and fully configured passport
+require('./router/routes.js')(app, passport, nodemailer, crypto, listaSesiones,listaDecisiones,
+    logueados, resultado_por_escenario, bool_result_final, resultado_final, resultados,jsontoxml);
 require('./config/passport')(passport, logueados); // pass passport for configuration
 app.use('/api', require('./router/api'));
 
@@ -117,7 +120,21 @@ models.sequelize.sync().then(function () {
 
         console.log('Alguien se ha conectado con Sockets',socket.id, socket.username);
 
+        socket.on('votos', function(data) {
+            io.sockets.emit('votos', data);
+            console.log("ENVIANDOOOOOOOOOO VOTOS: ", data.votos);
+        });
+
+        socket.on('grafico', function (data) {
+            io.sockets.emit('grafico', data);
+        });
+
+        socket.on('estadisticas', function (data) {
+            io.sockets.emit('estadisticas', data);
+        });
+
         socket.on('online', function (data) {
+            console.log("ESTOY ENVIANDO EL PUTO SOCKET", data.username);
             io.sockets.emit('online', data);
         });
         socket.on('chat', function (data) {
@@ -128,6 +145,9 @@ models.sequelize.sync().then(function () {
                 listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].mm,
                 listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].ss,
                 data.idSesion, data.indexEsc, listaSesiones, io);
+        });
+        socket.on('time_over', function (data){
+            io.sockets.emit('time_over',data);
         });
         socket.on('start', function (data) {
             io.sockets.emit('start', data);

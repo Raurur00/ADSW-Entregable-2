@@ -1,5 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
     var Voto = sequelize.define("Voto", {
+        prioridad: DataTypes.STRING
     }, {
         classMethods: {
             associate: function(models) {

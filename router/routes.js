@@ -6,7 +6,7 @@ var models  = require('../models');
 var decrypt = require('../controllers/decrypt');
 var encrypt = require('../controllers/encrypt');
 
-module.exports = function(app, passport, nodemailer, crypto, listaSesiones, listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final) {
+module.exports = function(app, passport, nodemailer, crypto, listaSesiones, listaDecisiones, logueados, resultado_por_escenario, bool_result_final, resultado_final,jsontoxml) {
 
     app.get('/', function (req, res) {
         res.render('index.html', {success: req.flash('success'),
@@ -111,8 +111,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                 propio: false,
                 notiempo: false,
                 escrepetido: false,
-                invitados: listaSesiones[idSesion].invitados,
-                escenarios: listaSesiones[idSesion].escenarios,
+                invitados: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
+                escenarios: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
                 noinv: false,
                 noesc: false
             });
@@ -128,8 +128,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
                     propio: true,
                     notiempo: false,
                     escrepetido: false,
-                    invitados: listaSesiones[idSesion].invitados,
-                    escenarios: listaSesiones[idSesion].escenarios,
+                    invitados: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
+                    escenarios: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
                     noinv: false,
                     noesc: false
                 });
@@ -148,8 +148,8 @@ module.exports = function(app, passport, nodemailer, crypto, listaSesiones, list
             propio: false,
             notiempo: false,
             escrepetido: false,
-            invitados: listaSesiones[idSesion].invitados,
-            escenarios: listaSesiones[idSesion].escenarios,
+            invitados: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
+            escenarios: jsontoxml(JSON.stringify({correos:listaSesiones[idSesion].invitados})),
             noinv: false,
             noesc: false
         });

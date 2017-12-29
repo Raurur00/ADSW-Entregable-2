@@ -1,3 +1,5 @@
 <form method="post" name ="inicio" action="/sesion/escenario/resultado/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
+    <input type="hidden" name="forzar_envio" id="forzar_envio" value="<%= forzar_envio %>">
+    <input type="hidden" name="english" id="english" value="<%= en %>">
     <body onload = "document.inicio.submit();"></body>
 </form>

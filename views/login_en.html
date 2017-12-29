@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/style.css" />
+</head>
+
+<body>
+<%- include("layout_en.html"); %>
+<section class="portfolio" id="portfolio">
+    <div class="container">
+        <p></p>
+        <p><h2 class="page-header">Login in your account!</h2></p>
+        <form method="post" action="/login_en">
+            <% if (error.length > 0) { %>
+            <div class="alert alert-danger"><%= error %></div>
+            <% } %>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" class="form-control" name="email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Password">
+            </div>
+            <input type="hidden" name = "english" id="english" value="true">
+            <button type="submit" class="btn btn-default">Login</button>
+        </form>
+    </div>
+</section>
+</body>
+
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="get" action="/login">\n' +
+        '<a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">Español</a>\n' +
+        '</form>\n';
+</script>
+
+</html>

@@ -1,79 +1,280 @@
-<link rel="stylesheet" href="/public/css/bootstrap.css" />
-<link rel="stylesheet" href="/public/css/style.css" />
-<script src="/controllers/sesionCtrl.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/style.css" />
+    <script src="/controllers/sesionCtrl.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <style> #header {margin:auto;width:500px;font-family:Arial, Helvetica, sans-serif;}  ul, ol {list-style:none;}
+    </style>
+    <link rel="stylesheet" type="text/css" href="/public/css/resutadoFinal.css">
+</head>
+<% if (en) { %>
+<%- include("layout_en.html"); %>
+<% } else  { %>
+<%- include("layout.html"); %>
+<% } %>
+<body>
+<section class="portfolio" id="portfolio">
+    <% if (historial) {%>
+    <% } else { %>
+    <div class="vertical">
+        <div id="counter"></div>
+        <div id="mario-chat">
+            <div  class="vertical-scroll" id="chat">
+                <div id="chat-window">
+                    <div id="output"></div>
+                </div>
+                <input type="hidden" id="handle" value="<%= username %>">
+                <input type="hidden" id="idSesion" value="<%= idSesion %>">
+            </div>
+            <div class="bot">
+                <%= username %>: <input id="message" type="text" placeholder="Message" onkeypress="myFunction(event)">
+                <button id="send">Send</button>
+            </div>
+        </div>
+        <br><br>
+        <script src="/public/js/cliente.js"></script>
+        <script>
+            var socket = io.connect(window.location.host);
+            socket.on('chat',function (data) {
+                if ((data.sesion == "<%=idSesion%>")) {
+                    output.innerHTML += '<p><strong>'+ data.handle +': </strong>'+data.message+'</p>';
+                    chat.scrollTop = chat.scrollHeight;
+                }
+            });
+        </script>
+    </div>
+    <% } %>
+
+    <p><div class="center-yeah" align="center" id="title"></div></p><br>
+
+    <p><div class="container" align="center">
+    <div id="altas"></div>
+    <div id="medias"></div>
+    <div id="altas_medias"></div>
+    </div></p><br>
+
+    <div class="container">
+        <div id="container1" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+        <div id="container2" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+        <div id="container3" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+        <div id="container4" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+        <div id="container5" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+    </div>
+
+    <div class="bot-right">
+        <% if (historial) { %>
+        <% if (en) { %>
+        <form method="get" action="/historial_en">
+            <button type="submit" class="btn btn-lg btn-info">
+                <% if (en) { %>Back<% } else { %> Volver <% } %>
+            </button>
+        </form>
+        <% } else { %>
+        <form method="get" action="/historial">
+            <button type="submit" class="btn btn-lg btn-info">
+                <% if (en) { %>Back<% } else { %> Volver <% } %>
+            </button>
+        </form>
+        <% } %>
+
+        <% } else { %>
+            <% if (creador) { %>
+                <button id="final" class="btn btn-lg btn-info">
+                    <input type="hidden" name ="english" id="english4" value="<%= en %>">
+                    <% if (en) { %>Finish Game<% } else { %> Finalizar Juego <% } %>
+                </button>
+                <script src="/public/js/final.js"></script>
+            <% } %>
+        <% } %>
+
+        <form method="post" id="terminar" action="/sesion/fin/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
+            <input type="hidden" name ="english" id="english5" value="<%= en %>">
+        </form>
 
 
-<div align="center" id="title"></div>
+        <script>
+            var socket = io.connect(window.location.host);
+            socket.on('final',function (data) {
+                if ((data.sesion == "<%=idSesion%>")) {
+                    document.getElementById('terminar').submit();
+                }
+            });
+        </script>
 
-<div id="altas"></div>
-<div id="medias"></div>
-<div id="altas_medias"></div>
+        <% if (historial) { %>
+            <form method="post" action="/historial/sesion">
+                <input type="hidden" name="sesion" id="sesion" value="<%= idSesion%>">
+                <select name="escenarios">
+                    <% esc.forEach(function(e) { %>
+                    <option value="<%=e%>"><% if (en) { %>Stage <% } else { %> Escenario <% } %> <%= e %></option>
+                    <% }); %>
+                </select>
+                <input type="hidden" name ="english" id="english2" value="<%= en %>">
+                <button type="submit" class="btn btn-lg btn-info">
+                    <% if (en) { %>Load Stage<% } else { %> Cargar Escenario <% } %>
+                </button>
+            </form>
+        <% } else { %>
+            <form method="post" action="/sesion/resultfinal/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
 
-<div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-<div id="container2" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-<div id="container3" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-<div id="container4" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+                <select name="escenarios">
+                    <% esc.forEach(function(e) { %>
+                    <option value="<%=e%>"><% if (en) { %> Stage<% } else { %> Escenario <% } %> <%= e %></option>
+                    <% }); %>
+                </select>
+                <input type="hidden" name ="english" id="english" value="<%= en %>">
+                <button type="submit" class="btn btn-lg btn-info">
+                    <% if (en) { %>Load Stage<% } else { %> Cargar Escenario <% } %>
+                </button>
+            </form>
+        <% }; %>
 
-<form method="post" action="/sesion/resultfinal/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
 
-<select name="escenarios">
-    <% esc.forEach(function(e) { %>
-    <option value="<%=e%>">Escenario <%= e %></option>
-    <% }); %>
-</select>
+    </div>
 
-<button type="submit" class="btn btn-lg btn-info">Cargar Escenario</button>
-</form>
+    <div class="container">
+        <ul class="nav-yeah" id="votos">
+        </ul>
+    </div>
 
-<script type="text/javascript" src="/public/js/grafico.js"></script>
-<script type="text/javascript">
-    var socket = io.connect(window.location.host);
-    var prob = JSON.parse('<%-JSON.stringify(probando)%>');
-    var prob1 = JSON.parse('<%-JSON.stringify(probando1)%>');
-    var prob2 = JSON.parse('<%-JSON.stringify(probando2)%>');
-    var prob3 = JSON.parse('<%-JSON.stringify(probando3)%>');
-    var list_idx = JSON.parse('<%-JSON.stringify(idx)%>');
-    var idx = parseInt(list_idx[0]);
+    <script type="text/javascript" src="/public/js/grafico.js"></script>
+    <script type="text/javascript">
+        var socket = io.connect(window.location.host);
+        var grafico1 = JSON.parse('<%-JSON.stringify(grafico1)%>');
+        var grafico2 = JSON.parse('<%-JSON.stringify(grafico2)%>');
+        var grafico3 = JSON.parse('<%-JSON.stringify(grafico3)%>');
+        var grafico4 = JSON.parse('<%-JSON.stringify(grafico4)%>');
+        var grafico5 = JSON.parse('<%-JSON.stringify(grafico5)%>');
+        var list_idx = JSON.parse('<%-JSON.stringify(idx)%>');
+        var idx = parseInt(list_idx[0]);
 
-    var decs_altas = JSON.parse('<%-JSON.stringify(todos_alta)%>')[idx-1][1];
-    var decs_medias = JSON.parse('<%-JSON.stringify(todos_media)%>')[idx-1][1];
-    var decs_altas_medias = JSON.parse('<%-JSON.stringify(todos_media_alta)%>')[idx-1][1];
+        var decs_altas = JSON.parse('<%-JSON.stringify(todos_alta)%>')[idx-1][1];
+        var decs_medias = JSON.parse('<%-JSON.stringify(todos_media)%>')[idx-1][1];
+        var decs_altas_medias = JSON.parse('<%-JSON.stringify(todos_media_alta)%>')[idx-1][1];
 
-    socket.on('start',function (data) {
-        document.location.reload(true);
-    });
-    socket.on('resultFinal',function (data) {
-        document.location.reload(true);
-    });
-    GRAFICO.init(idx,[prob[idx-1],prob1[idx-1],prob2[idx-1],prob3[idx-1]],["Decisiones con prioridad alta",
-            "Decisiones con prioridad media","Decisiones con prioridad media-alta","Decisiones no seleccionadas"],
-        ["container","container2","container3","container4"]);
-    GRAFICO.draw();
+        var Votos = JSON.parse('<%-JSON.stringify(resultados)%>')[idx-1];
+        var text = "";
+        for (var i = 0; i < Votos.length; i++) {
+            text += "<li><a>" + Votos[i][0] + "</a><ul>";
+            for (var j = 0; j < Votos[i][1].length; j++) {
+                text += "<li><a>" + Votos[i][1][j][0] +
+                    "</a><ul><li><a>" + Votos[i][1][j][1] + "</a></li></ul></li>";
+            }
+            text += "</ul></li>";
+        }
+        document.getElementById("votos").innerHTML = text;
 
-    if (decs_altas.length > 0)  document.getElementById("altas").innerHTML =
-        "Decisiones seleccionadas por todos y prioridad alta:";
-    if (decs_medias.length > 0) document.getElementById("medias").innerHTML =
-        "Decisiones seleccionadas por todos y prioridad media:";
-    if (decs_altas_medias.length > 0) document.getElementById("altas_medias").innerHTML =
-        "Decisiones seleccionadas por todos y prioridad alta/media:";
+        socket.on('start',function (data) {
+            document.location.reload(true);
+        });
+        socket.on('resultFinal',function (data) {
+            document.location.reload(true);
+        });
+        GRAFICO.init(idx,[grafico1[idx-1],grafico2[idx-1],grafico3[idx-1],grafico4[idx-1],grafico5[idx-1]],
+            ["<% if (en) { %>Decisions selected by all the participants<% } else { %> Decisiones seleccionadas por todos los participantes <% } %><br>" +
+            "<% if (en) { %>High Priority<% } else { %> Prioridad Alta <% } %>",
+                "<% if (en) { %>Decisions selected by all the participants<% } else { %> Decisiones seleccionadas por todos los participantes <% } %><br>" +
+                "<% if (en) { %>Medium Priority<% } else { %> Prioridad Media <% } %>",
+                "<% if (en) { %>Decisions selected by all the participants<% } else { %> Decisiones seleccionadas por todos los participantes <% } %><br>" +
+                "<% if (en) { %>medium-high Priority<% } else { %> Prioridad media-alta <% } %>",
+                "<% if (en) { %>Decisions selected by 50% of the participants<% } else { %> Decisiones seleccionadas por el 50% de los participantes <% } %><br>" +
+                "<% if (en) { %>High Priority<% } else { %> Prioridad Alta <% } %>",
+                "<% if (en) { %>Decisions selected by 50% of the participants<% } else { %> Decisiones seleccionadas por el 50% de los participantes <% } %><br>" +
+                "<% if (en) { %>medium-high Priority<% } else { %> Prioridad media-alta <% } %>"],
+            ["container1", "container2", "container3", "container4", "container5"],"<% if (en) { %>Stage<% } else { %> Escenario <% } %>");
+        GRAFICO.draw();
 
-    for (var i = 0; i < decs_altas.length; i++)
-    {
-        if (i == 0 ) document.getElementById("altas").innerHTML += " " + decs_altas[i];
-        else document.getElementById("altas").innerHTML += "," + decs_altas[i];
-    }
-    for (var i = 0; i < decs_medias.length; i++)
-    {
-        if (i == 0 ) document.getElementById("medias").innerHTML += " " + decs_medias[i];
-        else document.getElementById("medias").innerHTML += "," + decs_medias[i];
-    }
-    for (var i = 0; i < decs_altas_medias.length; i++)
-    {
-        if (i == 0 ) document.getElementById("altas_medias").innerHTML += " " + decs_altas_medias[i];
-        else document.getElementById("altas_medias").innerHTML += "," + decs_altas_medias[i];
-    }
+        if (decs_altas.length > 0)  document.getElementById("altas").innerHTML =
+            "<% if (en) { %>Decisions selected by all and high priority:<% } else { %> Decisiones seleccionadas por todos y prioridad alta: <% } %>";
+        if (decs_medias.length > 0) document.getElementById("medias").innerHTML =
+            "<% if (en) { %>Decisions selected by all and medium priority:<% } else { %> Decisiones seleccionadas por todos y prioridad media: <% } %>";
+        if (decs_altas_medias.length > 0) document.getElementById("altas_medias").innerHTML =
+            "<% if (en) { %>Decisions selected by all and high/medium priority:<% } else { %> Decisiones seleccionadas por todos y prioridad alta/media: <% } %>";;
+
+        for (var i = 0; i < decs_altas.length; i++)
+        {
+            if (i == 0 ) document.getElementById("altas").innerHTML += " " + decs_altas[i];
+            else document.getElementById("altas").innerHTML += "," + decs_altas[i];
+        }
+        for (var i = 0; i < decs_medias.length; i++)
+        {
+            if (i == 0 ) document.getElementById("medias").innerHTML += " " + decs_medias[i];
+            else document.getElementById("medias").innerHTML += "," + decs_medias[i];
+        }
+        for (var i = 0; i < decs_altas_medias.length; i++)
+        {
+            if (i == 0 ) document.getElementById("altas_medias").innerHTML += " " + decs_altas_medias[i];
+            else document.getElementById("altas_medias").innerHTML += "," + decs_altas_medias[i];
+        }
+    </script>
+</section>
+</body>
+<% if (en) { %>
+    <% if (historial) { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/historial/sesion">\n' +
+        '<input type="hidden" name = "username" id="username2" value="<%= username %>">\n' +
+        '<input type="hidden" name = "sesion" id="sesion" value="<%= idSesion %>">\n' +
+        '<a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">Español</a>\n' +
+        '</form>';
 </script>
+
+    <% } else { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/sesion/resultfinal/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">\n' +
+        '<input type="hidden" name = "username" id="username2" value="<%= username %>">\n' +
+        '<a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">Español</a>\n' +
+        '</form>';
+</script>
+
+    <% } %>
+
+<% } else { %>
+    <% if (historial) { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/historial/sesion">\n' +
+        '<input type="hidden" name = "username" id="username " value="<%= username %>">\n' +
+        '<input type="hidden" name = "english" id="english" value="true">\n' +
+        '<input type="hidden" name = "sesion" id="sesion" value="<%= idSesion %>">\n' +
+        '<a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">English</a>\n' +
+        '</form>';
+</script>
+
+    <% } else { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/sesion/resultfinal/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">\n' +
+        '<input type="hidden" name = "username" id="username " value="<%= username %>">\n' +
+        '<input type="hidden" name = "english" id="english" value="true">\n' +
+        '<a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">English</a>\n' +
+        '</form>';
+</script>
+    <% } %>
+<% } %>
+<div class="espacioBlanco"></div>
+

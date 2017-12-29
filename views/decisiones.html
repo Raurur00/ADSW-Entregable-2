@@ -1,41 +1,207 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="/public/css/bootstrap.css" />
-    <link rel="stylesheet" href="/public/css/style.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
+    <style>
+        div.bottom {
+            height: 200px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: none;
+            margin-bottom: none;
+        }
+
+        div.col {
+            float: left;
+            width: 25%;
+        }
+        div.col2 {
+            float: left;
+            width: 50%;
+        }
+        div.col3 {
+            float: left;
+            width: 33%;
+        }
+        div.wea {
+            position: relative;
+            left: 0;
+        }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
     <script src="/node_modules/angular-sanitize/angular-sanitize.js"></script>
-    <script src = "/node_modules/angular-xslt/src/ng-xslt.js"></script>
-    <script src="/controllers/decisionesCtrl.js"></script>
+    <script src="/node_modules/angular-xslt/src/ng-xslt.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-
+    <link rel="stylesheet" type="text/css" href="/public/css/decisiones.css">
 
 </head>
+<% if (en) { %>
+<%- include("layout_en.html"); %>
+<% } else  { %>
 <%- include("layout.html"); %>
-<body ng-app="sesion" ng-controller="decisiones">
-    <div class="col-md-4 col-md-offset-4">
-        <div id="counter"></div>
-        Escenario: <%= esc.objetivo %><br>
-        Index: <%= indexEsc %><br>
-        holaaaaaaa <%= username %><br>
+<% } %>
+<body>
+<section class="portfolio" id="portfolio">
+    <div class="container">
+        <img style="visibility: hidden" class="img-fluid mb-5 d-block mx-auto" src="/public/img/profile.png" alt="" height="1%" width="1%">
+    </div>
+    <div class="container ">
+    <div class="bottom" ng-app="sesion">
+        <div class="col2">
+            <h2> <% if (en) { %>Stage<% } else { %>Escenario<% } %>
+                <%= indexEsc +1 %></h2>
+            <h4><%= esc.objetivo %></h4>
+        </div>
+        <div class="col2">
+            <div class="timer" id="counter"></div>
+            <!--Username: <%= username %>-->
+        </div>
         <form method="post" action="/sesion/escenario/mandar_decisiones/<%= idSesionEnc %>/<%=indexEsc %>/<%= idPartEnc %>/<%= username %>">
-            <div ng-bind-html="'<%= dec%>' | xslt:decXslt | html"></div>
+            <div class="scroll">
+                <% dec.forEach(function(decision) { %>
+                <div class="tarjeta">
+                    <input type="hidden" name="ids[]" value="<%= decision.id %>">
+                    <div class="titulo"><h4><%= decision.nombre %></h4></div>
+                    <div class="requisito">
+                        <h4><% if (en) { %>Requirements<% } else { %> Requisitos <% } %></h4>
+                        <%= decision.mecanismo %>
+                    </div>
+                    <div class="decision">
+                        <h4><% if (en) { %>Decision<% } else { %> Decisión <% } %></h4>
+                        <%= decision.resultado %>
+                    </div>
+                    <div class="prioridad">
+                        <h4><% if (en) { %>Priority<% } else { %> Prioridad <% } %></h4>
+                        <select name="prioridad">
+                            <option value="No Seleccionada">
+                            <% if (en) { %>No Selected<% } else { %> No Seleccionada <% } %> </option>
+                            <option value="Baja">
+                                <% if (en) { %>Low<% } else { %> Baja <% } %> </option>
+                            <option value="Media">
+                                <% if (en) { %>Medium<% } else { %> Media <% } %> </option>
+                            <option value="Alta">
+                                <% if (en) { %>High<% } else { %> Alta <% } %> </option>
+                        </select>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <br>
+            <div id="forzar_cierre">
+                <input type="hidden" name="forzar_envio" id="forzar_envio" value="false">
+            </div>
+            <input type="hidden" name="english" id="english" value="<%= en %>">
+            <div class="col3">
+                <button type="submit" id = "resultado" class="btn btn-default">
+                    <% if (en) { %>Send<% } else { %> Enviar <% } %></button><br>
+            </div>
         </form>
+        <div class="col3">
+        <button type="submit" style="display: none" id = "pedir_tiempo" class="btn btn-default">
+            <% if (en) { %>Ask time<% } else { %> Pedir tiempo <% } %></button>
+        </div>
+        <div class="col3">
+        <button style="display: none" type="submit" id = "enviar_decisiones" class="btn btn-default">
+            <% if (en) { %>Finish deciding<% } else { %> Terminar de decidir <% } %></button>
+        </div>
+        <br><br>
+        <form method="post" id="post1" name="post1" action="/sesion/escenario/<%= idSesionEnc %>/<%=indexEsc %>/<%= idPartEnc %>/<%= username %>">
+            <p>
+                <div class="col"><button style="display: none" type="submit" id = "dar_tiempo" class="btn btn-default">
+                    <% if (en) { %>Give time<% } else { %> Dar tiempo <% } %></button></div>
+                <div class="col">
+                    <input style="display: none" type="number" class="form-control" name="hh" id="hh" required>
+                </div>
+                <div class="col">
+                    <input style="display: none" type="number" class="form-control" name="mm" id="mm" required>
+                </div>
+                <div class="col">
+                    <input style="display: none" type="number" class="form-control" name="ss" id="ss" required>
+                </div>
+            </p>
+            <input type="hidden" name="dar_tiempo" id="dt" value="true">
+            <input type="hidden" name="editar2" id="editar2" value="<%= editar %>">
+            <input type="hidden" name="english" id="english2" value="<%= en %>">
+        </form>
+
+
 
         <script> var socket = io.connect(window.location.host);
 
-        var counter = document.getElementById('counter');
+        document.getElementById("hh").value = 0;
+        document.getElementById("mm").value = 0;
+        document.getElementById("ss").value = 0;
+
+
+        if (parseInt("<%= idPart %>") === parseInt("<%= moderador %>"))
+        {
+            document.getElementById("hh").style.display = "inline";
+            document.getElementById("mm").style.display = "inline";
+            document.getElementById("ss").style.display = "inline";
+            document.getElementById("dar_tiempo").style.display = "inline";
+            document.getElementById("enviar_decisiones").style.display = "inline";
+        }
+        if (parseInt("<%= idPart %>") !== parseInt("<%= moderador %>"))
+        {
+            if ("<%= editar %>" != "true") document.getElementById("pedir_tiempo").style.display = "inline";
+        }
+
+        var darTiempo = document.getElementById('dar_tiempo');
+        darTiempo.addEventListener('click',function () {
+            socket.emit('givetimemod',{
+                idSesion: "<%= idSesion %>",
+                hh: document.getElementById("hh").value,
+                mm: document.getElementById("mm").value,
+                ss: document.getElementById("ss").value
+            });
+        });
+
+        var pedirTiempo = document.getElementById('pedir_tiempo');
+        pedirTiempo.addEventListener('click',function () {
+            socket.emit('pedir_tiempo',{
+                idPart: "<%= idPart %>",
+                idSesion: "<%= idSesion %>"
+            });
+        });
+        resultado = document.getElementById('resultado');
+
+        var noDarTiempo = document.getElementById('enviar_decisiones');
+        noDarTiempo.addEventListener('click',function () {
+            socket.emit('enviar_decisiones',{
+                sesion: "<%= idSesion %>",
+                indexEsc: parseInt("<%=indexEsc %>")
+            });
+        });
         resultado = document.getElementById('resultado');
 
 
         var x = setInterval(function() {
-
             // Get todays date and time
             var now = new Date().getTime();
-
             // Find the distance between now an the count down date
             var distance = "<%= hr_finish %>" - now;
-            if ("<%= editar %>" == "true") distance = "<%= tiempo_extra %>" - now;
+            if (parseInt("<%= hr_finish2 %>") > 0) distance = parseInt("<%= hr_finish2 %>") - now;
+            if ("<%= editar %>" == "true" || "<%= editar2 %>" == "true") distance = "<%= hr_finish_editar %>" - now;
 
             // Time calculations for days, hours, minutes and seconds
             var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -63,27 +229,66 @@
             if (distance < 0) {
                 clearInterval(x);
                 document.getElementById("counter").innerHTML = "SE ACABO DEL TIEMPO";
-                socket.emit("time_over",{
-                    idPart: "<%= idPart %>",
-                    idSesion: "<%= idSesion %>"
-                });
+                if (parseInt("<%= idPart %>") !== parseInt("<%= moderador %>")) {
+                    socket.emit("time_over", {
+                        idPart: "<%= idPart %>",
+                        idSesion: "<%= idSesion %>"
+                    });
+                }
             }
         }, 1000);
 
         // Output the result in an element with id="demo"
 
         socket.on('time_over', function (data){
-            if (parseInt("<%= idPart %>") === parseInt("<%= moderador %>"))
-                alert("oe se acabo del tiempo zi");
+            if (parseInt("<%= idPart %>") === parseInt("<%= moderador %>") &&
+                data.idSesion == "<%= idSesion %>") {
+                alert("Se ha acabado el tiempo para votar y aún faltan participantes, ¿Desea " +
+                    "agregar tiempo a la votación o enviar lo que tienen?");
+            }
+            //ENVIAR DECISIONES AQUI!!//
+        });
+        socket.on('pedir_tiempo', function (data){
+            if (parseInt("<%= idPart %>") === parseInt("<%= moderador %>") &&
+                data.idSesion == "<%= idSesion %>") {
+                alert(data.idPart + " te está pidiendo tiempo");
+            }
+        });
+        socket.on('enviar_decisiones', function (data){
+            if ((data.sesion == "<%=idSesion%>")) {
+                document.getElementById("forzar_cierre").innerHTML='<input type="hidden" name="forzar_envio" id="forzar_envio" value="true">';
+                document.getElementById("resultado").click();
+            }
+        });
+        /*socket.on('givetime',function(data){
+            if (parseInt("<%= idPart %>") !== parseInt("<%= moderador %>")) {
+                document.getElementById("hh").value = data.hh;
+                document.getElementById("mm").value = data.mm;
+                document.getElementById("ss").value = data.ss;
+                document.getElementById("dt").value = "true";
+                document.getElementById("dar_tiempo").click();
+            }
+            document.location.reload(true);
+        });*/
+        socket.on('givetimemod',function(data){
+            if ("<%= editar %>" != "true" && data.idSesion == "<%= idSesion %>")
+            if (parseInt("<%= idPart %>") !== parseInt("<%= moderador %>"))
+            {
+                document.getElementById("hh").value = data.hh;
+                document.getElementById("mm").value = data.mm;
+                document.getElementById("ss").value = data.ss;
+                document.getElementById("dt").value = "true";
+                document.getElementById("dar_tiempo").click();
+            }
         });
 
         console.log('iniciando timer..');
         socket.emit('iniciar',{
             hora: "<%= hor %>",
-        minuto: "<%= mi %>",
-        segundo: "<%= se %>",
-        indexEsc: "<%= indexEsc %>",
-        idSesion: "<%= idSesion %>"
+            minuto: "<%= mi %>",
+            segundo: "<%= se %>",
+            indexEsc: "<%= indexEsc %>",
+            idSesion: "<%= idSesion %>"
         });
 
         //Enviar mensaje al hacer click
@@ -91,10 +296,10 @@
             if ("<%= nocreador %>" == "true") {
                 socket.emit('resultado', {
                     idPart: "<%= idPart %>",
-                indexEsc: "<%= indexEsc %>",
-                idSesion: "<%= idSesion %>",
-                namePart: "<%= namePart %>"
-            });
+                    indexEsc: "<%= indexEsc %>",
+                    idSesion: "<%= idSesion %>",
+                    namePart: "<%= namePart %>"
+                });
             }
 
         });
@@ -103,8 +308,32 @@
         });
 
         </script>
-
-
     </div>
+    </div>
+</section>
 </body>
+<% if (en) { %>
+    <script>
+        document.getElementById("langButton").innerHTML =
+            '<form id="lang" method="post" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">\n' +
+            '    <input type="hidden" name = "username" id="username2" value="<%= username %>">\n' +
+            '    <input type="hidden" name = "editar" id="editar3" value="<%= editar %>">\n' +
+            '    <input type="hidden" name = "editar2" id="editar4" value="<%= editar %>">\n' +
+            '    <a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">Español</a>\n' +
+            '</form>';
+    </script>
+
+<% } else { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">\n' +
+        '    <input type="hidden" name = "english" id="english3" value="true">\n' +
+        '    <input type="hidden" name = "username" id="username" value="<%= username %>">\n' +
+        '    <input type="hidden" name = "editar" id="editar" value="<%= editar %>">\n' +
+        '    <input type="hidden" name = "editar2" id="editar5" value="<%= editar %>">\n' +
+        '    <a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">English</a>\n' +
+        '</form>';
+</script>
+
+<% } %>
 </html>

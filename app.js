@@ -11,15 +11,15 @@ var session      = require('express-session');
 var expressValidator = require('express-validator');
 var nodemailer = require("nodemailer");
 var crypto = require('crypto');
-var jsontoxml = require('jsontoxml');
 var lista_sockets = {};
-var resultados = {};
+//var resultados = {};
 var listaSesiones={};
-var listaDecisiones=null;
-var logueados = {};
-var resultado_por_escenario = {};
-var resultado_final = [];
-var bool_result_final = [-1,false, false, true]; /*[0] index del grafico por escenario
+
+
+//var logueados = {};
+//var resultado_por_escenario = {};
+//var resultado_final = [];
+/*var bool_result_final = [-1,false, false, true]; [0] index del grafico por escenario
                                              [1] cargar a la pagina de result final,
                                              [2] que los part puedan ir a result final
                                              [3] que no se vuelvan a cargar resultados al
@@ -92,17 +92,14 @@ app.use(nodeadmin(app));
 
 
 //Routes
-require('./router/routes.js')(app, passport, nodemailer, crypto, listaSesiones,listaDecisiones,
-    logueados, resultado_por_escenario, bool_result_final, resultado_final, resultados,jsontoxml);
-require('./config/passport')(passport, logueados); // pass passport for configuration
+require('./router/index.js')(app, passport, nodemailer, crypto, listaSesiones);
+require('./config/passport')(passport); // pass passport for configuration
 app.use('/api', require('./router/api'));
 
 app.locals = {
     olakease: "olakease",
-    logueados: logueados,
-    listaSesiones: listaSesiones,
-    listaDecisiones: listaDecisiones
-}
+    listaSesiones: listaSesiones
+};
 
 //Start Server
 models.sequelize.sync().then(function () {
@@ -118,11 +115,22 @@ models.sequelize.sync().then(function () {
            console.log(socket.id, socket.username, "SE DESCONECTO");
         });
 
-        console.log('Alguien se ha conectado con Sockets',socket.id, socket.username);
+        socket.on('iniciando',function (data){
+            io.sockets.emit('iniciando', data);
+        });
+
+        socket.on('sig',function (data){
+            console.log("AQUI VA EL SIG DE LA SESION: ", data.sesion);
+            io.sockets.emit('sig', data);
+        });
+
+        socket.on('final',function (data){
+            console.log("AQUI VA EL FIN DE LA SESION: ", data.sesion);
+            io.sockets.emit('final', data);
+        });
 
         socket.on('votos', function(data) {
             io.sockets.emit('votos', data);
-            console.log("ENVIANDOOOOOOOOOO VOTOS: ", data.votos);
         });
 
         socket.on('grafico', function (data) {
@@ -134,7 +142,6 @@ models.sequelize.sync().then(function () {
         });
 
         socket.on('online', function (data) {
-            console.log("ESTOY ENVIANDO EL PUTO SOCKET", data.username);
             io.sockets.emit('online', data);
         });
         socket.on('chat', function (data) {
@@ -149,25 +156,42 @@ models.sequelize.sync().then(function () {
         socket.on('time_over', function (data){
             io.sockets.emit('time_over',data);
         });
+        socket.on('enviar_decisiones', function (data){
+            listaSesiones[data.sesion].escenarios[data.indexEsc].enviar_decisiones = true;
+            console.log("ENVIAR TODAS LAS DECISIONES DE LA SESION ", data.sesion);
+            io.sockets.emit('enviar_decisiones', data);
+        });
+        socket.on('pedir_tiempo', function (data){
+            for (var i = 0; i < listaSesiones[data.idSesion].participantes.length; i++)
+                if (listaSesiones[data.idSesion].participantes[i].id == data.idPart)
+                {
+                    data.idPart = listaSesiones[data.idSesion].participantes[i].username;
+                    break;
+                }
+            io.sockets.emit('pedir_tiempo',data);
+        });
         socket.on('start', function (data) {
             io.sockets.emit('start', data);
+        });
+        socket.on('givetimemod', function (data) {
+            /*listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].hh = data.hh;
+            listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].mm = data.mm;
+            listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].ss = data.ss;*/
+            listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].flag = 1;
+            listaSesiones[data.idSesion].escenarios[listaSesiones[data.idSesion].IdxEscActual].bool = 0;
+            io.sockets.emit('givetimemod', data);
         });
         socket.on('resultFinal', function (data) {
             bool_result_final[2] = true;
             io.sockets.emit('resultFinal', data);
         });
         socket.on('resultado', function (data) { //agregar los part que ya mandaron sus decisiones
-
             listaSesiones[data.idSesion].escenarios[data.indexEsc].revisados.push(listaSesiones[data.idSesion].participantes[data.namePart].username);
             data.namePart = listaSesiones[data.idSesion].participantes[data.namePart].username;
             io.sockets.emit('resultado', data);
         });
         socket.on('ver_result', function (data) {
             io.sockets.emit('ver_result', data);
-        });
-        socket.on('conectado', function(data) {
-            socket.username = data.username;
-            var idSesion = data.idSesion;
         });
     });
 });

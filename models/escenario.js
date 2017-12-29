@@ -7,8 +7,6 @@ module.exports = function(sequelize, DataTypes) {
     }, {
         classMethods: {
             associate: function(models) {
-                Escenario.hasMany(models.Voto);
-                Escenario.hasMany(models.Historial);
                 Escenario.hasMany(models.Sesion_esc);
             }
         }

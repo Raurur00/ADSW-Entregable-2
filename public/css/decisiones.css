@@ -1,43 +1,131 @@
-
 div.scroll{
-    width: 700px;
-    height: 320px;
-    overflow:scroll;
+    width: 100%;
+    height: 500px;
+    overflow: scroll;
     white-space:nowrap;
-    background: grey;
+    background: mediumseagreen;
+}
+div.timer {
+    font-size: 30px;
 }
 div.tarjeta{
     white-space:normal;
-    display: inline-block;
-    width: 225px;
-    height: 300px;
-    border:1px solid;
-    cursor:move;
-    vertical-align: top;
+    border:6px solid;
+    width: 220px;
+    height: 290px;
     margin: 4px;
-    background: white;
-}
-div.tarjeta h2{
-    display: block;
-    text-align:justify;
-    margin: 5px;
-}
-div.tarjeta h4{
-    margin: 5px;
-    text-align:justify;
-}
-div.tarjeta p {
-    margin: 5px;
-    text-align:justify;
+    background: lightblue;
+    border-radius: 16px;
+    cursor:move;
+    display: inline-block;
+    margin-top: 90px;
+    -webkit-transition: all 0.1s ease;
+    -moz-transition: all 0.1s ease;
+    -ms-transition: all 0.1s ease;
+    transition: all 0.1s ease;
 }
 
-div.dragzone{
-    width: 700px;
-    height: 320px;
-    overflow:scroll;
-    white-space:nowrap;
-    background: #DCDCDC;
+div.tarjeta div.decision,
+div.tarjeta div.titulo,
+div.tarjeta div.prioridad,
+div.tarjeta div.requisito{
+    white-space:normal;
+    border:3px solid;
+    width: 180px;
+    margin: 4px;
+    font-size: 10px;
+    margin-left: 14px;
+    background: lightgray;
+    border-radius: 16px;
+    text-align: center;
+
+    -webkit-transition: all 0.1s ease;
+    -moz-transition: all 0.1s ease;
+    -ms-transition: all 0.1s ease;
+    transition: all 0.1s ease;
 }
-div.over{
-    border: 10px dashed #000;
+div.tarjeta div.decision h4,
+div.tarjeta div.titulo h4,
+div.tarjeta div.prioridad h4,
+div.tarjeta div.requisito h4{
+    font-size: 10px;
+
+    -webkit-transition: all 0.1s ease;
+    -moz-transition: all 0.1s ease;
+    -ms-transition: all 0.1s ease;
+    transition: all 0.1s ease;
+}
+
+div.tarjeta div.decision{
+    height: 90px;
+}
+div.tarjeta div.titulo{
+    height: 30px;
+}
+div.tarjeta div.prioridad{
+    height: 64px;
+}
+div.tarjeta div.requisito{
+    height: 74px;
+}
+
+div.tarjeta:hover{
+    white-space:normal;
+    border:9px solid;
+    width: 330px;
+    height: 435px;
+    margin: 6px;
+    background: lightblue;
+    border-radius: 24px;
+    cursor:move;
+
+    -webkit-transition: all 0.1s ease;
+    -moz-transition: all 0.1s ease;
+    -ms-transition: all 0.1s ease;
+    transition: all 0.1s ease;
+}
+
+div.tarjeta:hover div.decision,
+div.tarjeta:hover div.titulo,
+div.tarjeta:hover div.prioridad,
+div.tarjeta:hover div.requisito{
+    white-space:normal;
+    border:3px solid;
+    width: 270px;
+    margin: 6px;
+    font-size: 15px;
+    margin-left: 21px;
+    background: lightgray;
+    border-radius: 24px;
+    text-align: center;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -ms-user-select:none;
+
+    -webkit-transition: all 0.1s ease;
+    -moz-transition: all 0.1s ease;
+    -ms-transition: all 0.1s ease;
+    transition: all 0.1s ease;
+
+}
+div.tarjeta:hover div.decision h4,
+div.tarjeta:hover div.titulo h4,
+div.tarjeta:hover div.prioridad h4,
+div.tarjeta:hover div.requisito h4{
+    font-size: 15px;
+}
+
+div.tarjeta:hover div.decision{
+    height: 135px;
+}
+div.tarjeta:hover div.titulo{
+    height: 45px;
+}
+div.tarjeta:hover div.prioridad{
+    height: 96px;
+}
+div.tarjeta:hover div.requisito{
+    height: 111px;
 }

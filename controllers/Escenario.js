@@ -10,6 +10,10 @@ module.exports = function Escenario(objetivo,hh,mm,ss,sesionID){
     this.votos = [];
     this.revisados = [];
     this.ver_resultado = false;
+    this.hr_finish = 0; //tiempo agregado antes de que timer sea 0
+    this.hr_finish2 = 0; //tiempo de termino, cuando el timer ya es 0
+    this.flag = 1;
+    this.enviar_decisiones = false;
 
     this.crearEscenario = function(resolve){
         models.Escenario.create({
@@ -34,12 +38,13 @@ module.exports = function Escenario(objetivo,hh,mm,ss,sesionID){
         });
     };
 
-    this.crearVoto = function(prioridad, idDecision,idParticipante){
+    this.crearVoto = function(prioridad, idDecision,idParticipante, username){
         models.Voto.create({
             prioridad: prioridad,
-            DecisionId: idDecision,
-            EscenarioId: this.id,
-            ParticipanteId: idParticipante
-        });
+            idDec: idDecision,
+            idEsc: this.id,
+            idPart: idParticipante,
+            username: username
+        })
     };
 };

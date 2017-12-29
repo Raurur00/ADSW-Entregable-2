@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/public/css/bootstrap.css" />
+    <link rel="stylesheet" href="/public/css/style.css" />
+
+</head>
+<%- include("layout.html"); %>
+<body>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Mecanismo</th>
+                    <th>Resultado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% dec.forEach(function(decision) { %>
+                    <tr>
+                        <td><%= decision.nombre %></td>
+                        <td><%= decision.mecanismo %></td>
+                        <td><%= decision.resultado %></td>
+                        <td>
+                            <form method="post" action="/editarDec">
+                                <input type="hidden" name='id' value="<%= decision.id %>">
+                                <button type="submit" id = "Editar" class="btn btn-default">
+                                    Editar
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" action="/eliminarDecision">
+                                <input type="hidden" name='id' value="<%= decision.id %>">
+                                <button type="submit" id = "Eliminar" class="btn btn-default">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

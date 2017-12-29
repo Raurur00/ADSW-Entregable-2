@@ -1,28 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>I.T. Force</title>
-    <link rel="stylesheet" href="/css/bootstrap.css" />
-    <link rel="stylesheet" href="/css/style.css" />
-    <link rel="stylesheet" href="/css/decisiones.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
+    <style>
+        .bg-primary {
+            background-color: #7dcaa5 !important; }
+        .bg-secondary {
+            background-color: #053434 !important; }
+        .bg-img {
+            position: relative;
+            background-image: url('/public/img/decision.jpg');
+            background-size: 100% 125%
+        }
+
+    </style>
+
 </head>
-<body>
-<div class="container">
-    <div class="header clearfix">
-        <nav>
-            <ul class="nav nav-pills pull-right">
-                <li role="presentation"><a href="/">Inicio</a></li>
+
+<body id="page-top">
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg bg-secondary fixed-top text-uppercase" id="mainNav">
+    <div class="container">
+        <% if (!locals.user) { %>
+            <a class="navbar-brand nav-link js-scroll-trigger" href="/">Inicio</a>
+        <% } else { %>
+            <% if (locals.user.registrado) { %>
+                <a class="navbar-brand nav-link js-scroll-trigger" href="/">Inicio</a>
+            <% } %>
+            <% if (locals.user.pass) { %>
+                <a class="navbar-brand nav-link js-scroll-trigger" href="/homeAdmin">Inicio</a>
+            <% }; %>
+        <% }; %>
+
+        <button class="navbar-toggler navbar-toggler-right text-uppercase bg-primary text-white rounded" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/#portfolio">Crear juego</a>
+                </li>
                 <% if (!locals.user) { %>
-                <li role="presentation"><a href="/login">Iniciar Sesion</a></li>
-                <li role="presentation"><a href="/registro">Regístrate</a></li>
-                <% } %>
-                <% if (locals.user) { %>
-                <li role="presentation"><a href="/logout">Salir</a></li>
-                <% } %>
+                    <li class="nav-item mx-0 mx-lg-1">
+                        <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/login">Iniciar sesión</a>
+                    </li>
+                    <li class="nav-item mx-0 mx-lg-1">
+                        <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/registro">Registrarme</a>
+                    </li>
+                    <li class="nav-item mx-0 mx-lg-1">
+                        <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/loginAdmin">Entrar como admin</a>
+                    </li>
+                <% } else { %>
+                    <% if (locals.user.registrado) { %>
+                        <li class="nav-item mx-0 mx-lg-1">
+                            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/historial">Historial</a>
+                        </li>
+                    <% } %>
+                    <% if (locals.user.pass) { %>
+                        <li class="nav-item mx-0 mx-lg-1">
+                            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/agregarDecision">Agregar Decisión</a>
+                        </li>
+                    <% }; %>
+                    <li class="nav-item mx-0 mx-lg-1">
+                        <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/logout">Cerrar sesión</a>
+                    </li>
+                <% }; %>
+                <li id="langButton" class="nav-item mx-0 mx-lg-1">
+                </li>
             </ul>
-        </nav>
-        <h3 class="text-muted">I.T. Force</h3>
+        </div>
     </div>
-</div>
+</nav>
 </body>
 </html>
+

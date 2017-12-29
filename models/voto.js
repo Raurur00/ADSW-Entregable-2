@@ -1,14 +1,12 @@
 module.exports = function(sequelize, DataTypes) {
     var Voto = sequelize.define("Voto", {
+        idPart: {type: DataTypes.INTEGER, primaryKey: true},
+        idEsc: {type: DataTypes.INTEGER, primaryKey: true},
+        idDec: {type: DataTypes.INTEGER, primaryKey: true},
+        username: DataTypes.STRING,
         prioridad: DataTypes.STRING
     }, {
-        classMethods: {
-            associate: function(models) {
-                Voto.belongsTo(models.Participante,{primaryKey: true});
-                Voto.belongsTo(models.Decision,{primaryKey: true});
-                Voto.belongsTo(models.Escenario,{primaryKey: true});
-            }
-        }
     });
     return Voto;
 };
+

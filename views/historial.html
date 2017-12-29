@@ -1,0 +1,51 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/style.css" />
+</head>
+
+<%- include("layout.html"); %>
+<body>
+<section class="portfolio" id="portfolio">
+    <div class="container">
+        <p></p>
+        <p><h2>Estos son los juegos en que haz participado!</h2></p>
+        <form method="post" action="/historial/sesion">
+            <select name="sesion">
+                <% sesiones.forEach(function(sesion) { %>
+                <option value="<%=sesion.id%>"><%= sesion.titulo %></option>
+                <% }); %>
+            </select>
+            <button type="submit" class="btn btn-lg btn-info">Cargar Juego</button>
+        </form>
+    </div>
+</section>
+</body>
+
+
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="get" action="/historial_en">\n' +
+        '<a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">English</a>\n' +
+        '</form>'
+</script>
+
+

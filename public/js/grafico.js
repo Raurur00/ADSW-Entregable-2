@@ -4,15 +4,17 @@ var GRAFICO = GRAFICO || (function(){
     var _args = []; // private
     var _names = [];
     var _listdivs = [];
+    var _text = "";
     return {
-        init : function(idx,Args,list_names,list_divs) {
+        init : function(idx,Args,list_names,list_divs,text) {
             _idx = idx;
             _names = list_names;
             _args = Args;
             _listdivs = list_divs;
+            _text = text;
         },
         draw: function() {
-            document.getElementById("title").innerHTML = "<h2>"+ "Escenario " + _idx + " "+"<h2>";
+            document.getElementById("title").innerHTML = "<h2>"+ _text + _idx + " "+"<h2>";
             // Build the chart
             for (var i = 0; i < _listdivs.length; i++)
             {

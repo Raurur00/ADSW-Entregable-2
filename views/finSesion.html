@@ -1,0 +1,59 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/style.css" />
+    <link rel="stylesheet" href="/public/css/style.css" />
+</head>
+
+<% if (en) { %>
+<%- include("layout_en.html"); %>
+<% } else  { %>
+<%- include("layout.html"); %>
+<% } %>
+<body>
+<section class="portfolio" id="portfolio">
+    <div class="container">
+        <img style="visibility: hidden" class="img-fluid mb-5 d-block mx-auto" src="/public/img/profile.png" alt="" height="3%" width="3%">
+    </div>
+    <div class="container">
+        <h2><% if (en) { %>Thanks for participate! :D <% } else { %> Gracias por participar! :D <% } %></h2>
+    </div>
+</section>
+</body>
+
+<% if (en) { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/sesion/fin/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">\n' +
+        '    <input type="hidden" name = "username" id="username2" value="<%= username %>">\n' +
+        '    <a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">Español</a>\n' +
+        '</form>';
+</script>
+<% } else { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/sesion/fin/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">\n' +
+        '    <input type="hidden" name = "username" id="username " value="<%= username %>">\n' +
+        '    <input type="hidden" name = "english" id="english" value="true">\n' +
+        '    <a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">English</a>\n' +
+        '</form>';
+</script>
+<% } %>

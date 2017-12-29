@@ -1,7 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="/public/css/bootstrap.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/css/style.css" />
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -11,62 +30,15 @@
     <script src="/controllers/resultadoCtrl.js"></script>
     <script src="/public/js/grafico.js"></script>
     <style> #header {margin:auto;width:500px;font-family:Arial, Helvetica, sans-serif;}  ul, ol {list-style:none;}
-        .nav-yeah {
-            width:500px;
-            margin:0 auto;
-            height: 500px;
-        }
-        .nav-yeah > li {
-            float:left;
-        }
-        .nav-yeah li a {
-            text-decoration:none;padding:10px 12px;display:block;
-        }
-        .nav-yeah li ul {
-            display:none;
-            position:absolute;
-            min-width:140px;
-        }
-        .nav-yeah li:hover > ul {
-            display:block;
-        }
-        .nav-yeah li ul li {
-            position:relative;
-        }
-        .nav-yeah li ul li ul {
-            right:-140px;
-            top:0px;
-        }
-        .vertical{
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 18%;
-        }
-        .vertical-scroll {
-            position: fixed;
-            left: 1%;
-            top: 0;
-            height: 90%;
-            width: 18%;
-            overflow:auto;
-            word-break:break-all;
-        }
-        .bot {
-            position: fixed;
-            bottom: 3%;
-            left: 1%;
-        }
-        .bot-right {
-            position: fixed;
-            bottom: 3%;
-            right: 1%;
-        }
     </style>
 </head>
+<% if (en) { %>
+<%- include("layout_en.html"); %>
+<% } else  { %>
 <%- include("layout.html"); %>
+<% } %>
 <body ng-app="resultado" ng-controller="esperando">
+<section class="portfolio" id="portfolio">
     <div class="vertical">
         <div id="counter"></div>
         <div id="mario-chat">
@@ -79,177 +51,340 @@
             </div>
             <div class="bot">
                 <%= username %>: <input id="message" type="text" placeholder="Message" onkeypress="myFunction(event)">
-                <button id="send">Send</button>
+                <button id="send" class="btn btn-default" >Send</button>
             </div>
         </div>
         <br><br>
         <script src="/public/js/cliente.js"></script>
-        <script src="/public/js/moderador.js"></script>
+        <script>
+            var socket = io.connect(window.location.host);
+            socket.on('chat',function (data) {
+                if ((data.sesion == "<%=idSesion%>")) {
+                    output.innerHTML += '<p><strong>'+ data.handle +': </strong>'+data.message+'</p>';
+                    chat.scrollTop = chat.scrollHeight;
+                }
+            });
+        </script>
     </div>
 
     <div class="container">
-        Conectados: <br>
-        <% names.forEach(function(nombre) { %>
-            <%= nombre %><br>
-        <% }); %>
         <div id="chat-window2">
             <div id="test"></div>
         </div>
-        Index: <%= indexEsc %><br>
             <% if (creador) { %>
                 <% revisados.forEach(function(r) { %>
-                    <%= r  %> ya envió sus decisiones <br>
+                    <%= r  %> <% if (en) { %>sent his decisions<% } else
+        { %> ya envió sus decisiones <% } %> <br>
                 <% }); %>
         <% } %>
+    </div>
+
+    <p><div class="center-yeah" align="center" id="title"></div></p><br>
+
+    <p><div class="container" align="center">
         <div id="altas"></div>
         <div id="medias"></div>
         <div id="altas_medias"></div>
+    </div></p><br>
+
+    <div class="container">
+        <ul class="nav-yeah" id="votos">
+        </ul>
     </div>
 
-    <div align="center" id="title"></div>
-    <div id="container1" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-    <div id="container2" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-    <div id="container3" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-    <div id="container4" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+    <div class="container">
+        <div class="center-yeah">
+            <div id="container1" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            <div id="container2" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            <div id="container3" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            <div id="container4" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            <div id="container5" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+        </div>
+    </div>
+
     <script>
         var socket = io.connect(window.location.host);
         var list_idx = JSON.parse('<%-JSON.stringify(idx)%>');
         var idx = parseInt(list_idx[0]);
         socket.emit('grafico', {
-            datos1: '<%-JSON.stringify(probando1)%>',
-            datos2: '<%-JSON.stringify(probando2)%>',
-            datos3: '<%-JSON.stringify(probando3)%>',
-            datos4: '<%-JSON.stringify(probando4)%>',
+            datos1: '<%-JSON.stringify(grafico1)%>',
+            datos2: '<%-JSON.stringify(grafico2)%>',
+            datos3: '<%-JSON.stringify(grafico3)%>',
+            datos4: '<%-JSON.stringify(grafico4)%>',
+            datos5: '<%-JSON.stringify(grafico5)%>',
+            sesion: "<%= idSesion %>",
             idx: idx
         });
         socket.on('grafico', function (data) {
-            GRAFICO.init(data.idx+1, [JSON.parse(data.datos1)[0], JSON.parse(data.datos2)[0], JSON.parse(data.datos3)[0],
-                    JSON.parse(data.datos4)[0]],
-                ["Decisiones con prioridad Alta", "Decisiones con prioridad Media", "Decisiones con prioridad media-alta",
-                    "Decisiones no seleccionadas"],
-                ["container1", "container2", "container3", "container4"]);
-            GRAFICO.draw();
+            if ((data.sesion == "<%=idSesion%>")) {
+                GRAFICO.init(data.idx+1, [JSON.parse(data.datos1)[0], JSON.parse(data.datos2)[0], JSON.parse(data.datos3)[0],
+                        JSON.parse(data.datos4)[0],JSON.parse(data.datos5)[0]],
+                    ["<% if (en) { %>Decisions selected by all the participants<% } else { %> Decisiones seleccionadas por todos los participantes <% } %><br>" +
+                    "<% if (en) { %>High Priority<% } else { %> Prioridad Alta <% } %>",
+                        "<% if (en) { %>Decisions selected by all the participants<% } else { %> Decisiones seleccionadas por todos los participantes <% } %><br>" +
+                        "<% if (en) { %>Medium Priority<% } else { %> Prioridad Media <% } %>",
+                        "<% if (en) { %>Decisions selected by all the participants<% } else { %> Decisiones seleccionadas por todos los participantes <% } %><br>" +
+                        "<% if (en) { %>medium-high Priority<% } else { %> Prioridad media-alta <% } %>",
+                        "<% if (en) { %>Decisions selected by 50% of the participants<% } else { %> Decisiones seleccionadas por el 50% de los participantes <% } %><br>" +
+                        "<% if (en) { %>High Priority<% } else { %> Prioridad Alta <% } %>",
+                        "<% if (en) { %>Decisions selected by 50% of the participants<% } else { %> Decisiones seleccionadas por el 50% de los participantes <% } %><br>" +
+                        "<% if (en) { %>medium-high Priority<% } else { %> Prioridad media-alta <% } %>"],
+                    ["container1", "container2", "container3", "container4", "container5"],"<% if (en) { %>Stage <% } else { %> Escenario <% } %>");
+                GRAFICO.draw();
+            }
         });
         socket.emit('estadisticas', {
             altas: '<%-JSON.stringify(altas)%>',
             medias: '<%-JSON.stringify(medias)%>',
             altas_medias: '<%-JSON.stringify(altas_medias)%>',
+            sesion: "<%= idSesion %>",
             idx: idx
         });
         socket.on('estadisticas', function (data) {
-            var decs_altas = JSON.parse(data.altas)[0][1];
-            var decs_medias = JSON.parse(data.medias)[0][1];
-            var decs_altas_medias = JSON.parse(data.altas_medias)[0][1];
+            alert("estadisticas");
+            if ((data.sesion == "<%=idSesion%>")) {
+                var decs_altas = JSON.parse(data.altas)[0][1];
+                var decs_medias = JSON.parse(data.medias)[0][1];
+                var decs_altas_medias = JSON.parse(data.altas_medias)[0][1];
 
-            if (decs_altas.length > 0)  document.getElementById("altas").innerHTML =
-                "Decisiones seleccionadas por todos y prioridad alta:";
-            if (decs_medias.length > 0) document.getElementById("medias").innerHTML =
-                "Decisiones seleccionadas por todos y prioridad media:";
-            if (decs_altas_medias.length > 0) document.getElementById("altas_medias").innerHTML =
-                "Decisiones seleccionadas por todos y prioridad alta/media:";
+                if (decs_altas.length > 0) document.getElementById("altas").innerHTML =
+            "<% if (en) { %>Decisions selected by all and high priority:<% } else { %> " +
+                    "Decisiones seleccionadas por todos y prioridad alta: <% } %>";
+                else document.getElementById("altas").innerHTML = "";
+                if (decs_medias.length > 0) document.getElementById("medias").innerHTML =
+                    "<% if (en) { %>Decisions selected by all and medium priority:<% } else { %> " +
+                    "Decisiones seleccionadas por todos y prioridad media: <% } %>";
+                else document.getElementById("medias").innerHTML = "";
+                if (decs_altas_medias.length > 0) document.getElementById("altas_medias").innerHTML =
+                    "<% if (en) { %>Decisions selected by all and high/medium priority:<% } else { %> " +
+                    "Decisiones seleccionadas por todos y prioridad alta/media: <% } %>";
+                else document.getElementById("altas_medias").innerHTML = "";
 
-            for (var i = 0; i < decs_altas.length; i++)
-            {
-            if (i == 0 ) document.getElementById("altas").innerHTML += " " + decs_altas[i];
-            else document.getElementById("altas").innerHTML += "," + decs_altas[i];
-            }
-            for (var i = 0; i < decs_medias.length; i++)
-            {
-                if (i == 0 ) document.getElementById("medias").innerHTML += " " + decs_medias[i];
-                else document.getElementById("medias").innerHTML += "," + decs_medias[i];
-            }
-            for (var i = 0; i < decs_altas_medias.length; i++)
-            {
-                if (i == 0 ) document.getElementById("altas_medias").innerHTML += " " + decs_altas_medias[i];
-                else document.getElementById("altas_medias").innerHTML += "," + decs_altas_medias[i];
+                for (var i = 0; i < decs_altas.length; i++) {
+                    if (i == 0) document.getElementById("altas").innerHTML += " " + decs_altas[i];
+                    else document.getElementById("altas").innerHTML += "," + decs_altas[i];
+                }
+                for (var i = 0; i < decs_medias.length; i++) {
+                    if (i == 0) document.getElementById("medias").innerHTML += " " + decs_medias[i];
+                    else document.getElementById("medias").innerHTML += "," + decs_medias[i];
+                }
+                for (var i = 0; i < decs_altas_medias.length; i++) {
+                    if (i == 0) document.getElementById("altas_medias").innerHTML += " " + decs_altas_medias[i];
+                    else document.getElementById("altas_medias").innerHTML += "," + decs_altas_medias[i];
+                }
             }
         });
         socket.emit('votos', {
+            sesion: "<%= idSesion %>",
             votos: '<%-JSON.stringify(VotosporPart)%>'
         });
         socket.on('votos', function(data) {
-            var Votos = JSON.parse(data.votos);
-            var text = "";
-            for (var i = 0; i < Votos.length; i ++)
-            {
-                text += "<li><a>"+Votos[i][0]+"</a><ul>";
-                for (var j = 0; j < Votos[i][1].length; j++)
-                {
-                    text += "<li><a>"+Votos[i][1][j][0]+
-                        "</a><ul><li><a>"+Votos[i][1][j][1]+"</a></li></ul></li>";
+            alert(JSON.parse(data.votos));
+            if ((data.sesion == "<%=idSesion%>")) {
+                var Votos = JSON.parse(data.votos);
+                var text = "";
+                for (var i = 0; i < Votos.length; i++) {
+                    text += "<li><a>" + Votos[i][0] + "</a><ul>";
+                    for (var j = 0; j < Votos[i][1].length; j++) {
+                        text += "<li><a>" + Votos[i][1][j][0] +
+                            "</a><ul><li><a>" + Votos[i][1][j][1] + "</a></li></ul></li>";
+                    }
+                    text += "</ul></li>";
                 }
-                text += "</ul></li>";
+                document.getElementById("votos").innerHTML = text;
             }
-            document.getElementById("votos").innerHTML = text;
-        });
-        socket.on('start',function (data) {
-            document.location.reload(true);
-        });
-        socket.on('resultFinal',function (data) {
-            document.location.reload(true);
         });
     </script>
-    <div class="container">
-        <ul class="nav-yeah" id="votos">
-            <!--<% VotosporPart.forEach(function(r) { %>
-            <li><a><%= r[0] %></a>
-                <ul>
-                    <% r[1].forEach(function(a) { %>
-                    <li><a><%= a[0] %></a>
-                        <ul>
-                            <li><a><%= a[1] %></a></li>
-                        </ul>
-                    </li>
-                    <% }); %>
-                </ul>
-                <% }); %>
-            -->
-        </ul>
+
+    <% if (creador) { %>
+    <div class="center-bot">
+        <form method="post" id="post1" name="post1" action="/sesion/escenario/resultado/<%= idSesionEnc %>/<%=indexEsc %>/<%= idPartEnc %>/<%= username %>">
+            <div class="col">
+                <button  type="submit" id = "dar_tiempo" class="btn btn-default">
+                    <% if (en) { %>Give time<% } else { %> Dar tiempo <% } %></button>
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" name="hh" id="hh" required>
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" name="mm" id="mm" required>
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" name="ss" id="ss" required>
+            </div>
+            <input type="hidden" name="dar_tiempo" id="dt" value="true">
+            <input type="hidden" name="english" id="english3" value="<%= en %>">
+
+        </form>
     </div>
+    <% } %>
+
     <div class="bot-right">
-        <form method="post" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-            <input type="hidden" name="editar" value="true">
-            <button type="submit" class="btn btn-lg btn-info">Editar mis Decisiones</button>
-        </form>
+        <div id="terminarDeDecidir">
+            <% if (creador) { %>
+            <button type="submit" id = "enviar_decisiones" class="btn btn-lg btn-info">
+                <% if (en) { %>Finish deciding<% } else { %> Terminar de decidir <% } %></button>
+            <% } %>
+        </div>
+        <div id="editarDecisiones">
+            <form method="post" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc - 1 %>/<%= idPartEnc %>/<%= username %>">
+                <input type="hidden" name="editar" value="true">
+                <input type="hidden" name="english" id="english2" value="<%= en %>">
+                <br><button type="submit" class="btn btn-lg btn-info">
+                <% if (en) { %>Edit my decisions<% } else { %> Editar mis decisiones <% } %>
+            </button>
+            </form>
+        </div>
         <br>
-        <% if (creador) { %>
-        <% if (result_final) { %>
-        <form method="post" action="/sesion/resultfinal/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-            <button type="submit" id = "resultfinal" class="btn btn-lg btn-info">Resultado final</button>
-        </form>
+        <div id="siguiente" style = "display: none">
+            <button id = "sig" class="btn btn-lg btn-info">
+                <% if (en) { %>Next Stage<% } else { %> Siguiente Escenario <% } %>
+            </button>
+        </div>
+        <div id="fin" style = "display: none">
+            <button id = "final" class="btn btn-lg btn-info">
+                <% if (en) { %>Final result<% } else { %> Resultado final <% } %>
+            </button>
+        </div>
+        <script src="/public/js/final.js"></script>
+        <script src="/public/js/sig.js"></script>
         <script>
-            var resultFinal = document.getElementById('resultfinal');
-            resultFinal.addEventListener('click',function () {
-                socket.emit('resultFinal', {
+            var socket = io.connect(window.location.host);
+            socket.on('enviar_decisiones', function(data) {
+                if (data.sesion == "<%= idSesion %>") {
+                    document.getElementById("terminarDeDecidir").innerHTML = "";
+                    document.getElementById("editarDecisiones").innerHTML = "";
+                    document.getElementById('dar_tiempo').style.display = "none";
+                    document.getElementById('hh').style.display = "none";
+                    document.getElementById('mm').style.display = "none";
+                    document.getElementById('ss').style.display = "none";
+                    document.getElementById("siguiente").style.display = "inline";
+                    document.getElementById("fin").style.display = "inline";
+
+                }
+            });
+            var btn = document.getElementById('enviar_decisiones');
+
+            btn.addEventListener('click',function () {
+                socket.emit('enviar_decisiones',{
+                    sesion: idSesion.value,
+                    indexEsc: parseInt("<%=indexEsc -1 %>")
                 });
             });
         </script>
-        <% } %>
-        <% } else { %>
-        <% if (result_final_part) { %>
-        <form method="post" name = "resultfinal" action="/sesion/resultfinal/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-            <body onload = "document.resultfinal.submit();"></body>
-        </form>
-        <% } %>
-        <% } %>
 
-        <% if (!result_final) { %>
-        <% if (creador) { %>
-        <form method="post" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
+        <script>
+            if ("<%= dec_enviadas %>" == "true"){
+                document.getElementById("terminarDeDecidir").innerHTML = "";
+                document.getElementById("editarDecisiones").innerHTML = "";
+                document.getElementById('dar_tiempo').style.display = "none";
+                document.getElementById('hh').style.display = "none";
+                document.getElementById('mm').style.display = "none";
+                document.getElementById('ss').style.display = "none";
+                document.getElementById("siguiente").style.display = "inline";
+                document.getElementById("fin").style.display = "inline";
+            }
+            if ("<%= result_final %>" == "false") {
+                document.getElementById("fin").innerHTML = "";
+            } else {
+                document.getElementById("siguiente").innerHTML = "";
+            }
+            if ("<%= forzar_envio %>" == "true") {
+                document.getElementById("terminarDeDecidir").innerHTML = "";
+                document.getElementById("editarDecisiones").innerHTML = "";
+                document.getElementById("siguiente").style.display = "inline";
+                document.getElementById("fin").style.display = "inline";
+            }
+            if ("<%= creador %>" == "false") {
+                document.getElementById("fin").innerHTML = "";
+                document.getElementById("siguiente").innerHTML = "";
+            }
+        </script>
+
+
+        <form method="post" id="resultadoFinal" action="/sesion/resultfinal/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
+            <input type="hidden" name="english" value="<%= en %>">
+        </form>
+
+        <form method="post" id="sigEsc" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
+            <input type="hidden" name="english" value="<%= en %>">
             <input type="hidden" name="editar" value="false">
-            <button type="submit" id = "iniciar_sesion" class="btn btn-lg btn-info">Iniciar siguiente escenario</button>
         </form>
-        <script src="/public/js/start.js"></script>
-        <% } %>
-        <% } %>
-
-        <% if (inicio) { %>
-        <form method="post" name ="inicio" action="/sesion/escenario/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">
-            <input type="hidden" id="editar" value="false">
-            <body onload = "document.inicio.submit();"></body>
-        </form>
-        <% } %>
     </div>
+
+    <script>
+        var socket = io.connect(window.location.host);
+        socket.on('sig',function (data) {
+            if ((data.sesion == "<%=idSesion%>")) {
+                document.getElementById('sigEsc').submit();
+            }
+        });
+        socket.on('final',function (data) {
+            if ((data.sesion == "<%=idSesion%>")) {
+                document.getElementById('resultadoFinal').submit();
+            }
+        });
+
+        document.getElementById("hh").value = 0;
+        document.getElementById("mm").value = 0;
+        document.getElementById("ss").value = 0;
+        /*if (parseInt("<%= idPart %>") === parseInt("<%= moderador %>")) YA NO NECESARIO
+        {
+            document.getElementById("hh").style.display = "inline";
+            document.getElementById("mm").style.display = "inline";
+            document.getElementById("ss").style.display = "inline";
+            document.getElementById("dar_tiempo").style.display = "inline";
+            document.getElementById("enviar_decisiones").style.display = "inline";
+        }*/
+        var darTiempo = document.getElementById('dar_tiempo');
+        darTiempo.addEventListener('click',function () {
+            socket.emit('givetimemod',{
+                idSesion: "<%= idSesion %>",
+                hh: document.getElementById("hh").value,
+                mm: document.getElementById("mm").value,
+                ss: document.getElementById("ss").value,
+                flag: "true"
+            });
+        });
+        /*var noDarTiempo = document.getElementById('enviar_decisiones');
+        noDarTiempo.addEventListener('click',function () {
+            socket.emit('enviar_decisiones', {
+                sesion: "<%= idSesion %>"
+            });
+        });*/
+        socket.on('pedir_tiempo', function (data){
+            if (parseInt("<%= idPart %>") === parseInt("<%= moderador %>")) {
+                alert(data.idPart + " te está pidiendo tiempo");
+            }
+        });
+        socket.on('time_over', function (data){
+            if (parseInt("<%= idPart %>") === parseInt("<%= moderador %>")) {
+                alert("Se ha acabado el tiempo para votar y aún faltan participantes, ¿Desea " +
+                    "agregar tiempo a la votación o enviar lo que tienen?");
+            }
+            //ENVIAR DECISIONES AQUI!!//
+        });
+    </script>
+</section>
 </body>
+<% if (en) { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/sesion/escenario/resultado/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">\n' +
+        '    <input type="hidden" name = "username" id="username2" value="<%= username %>">\n' +
+        '    <a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">Español</a>\n' +
+        '</form>';
+</script>
+<% } else { %>
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="post" action="/sesion/escenario/resultado/<%= idSesionEnc %>/<%= indexEsc %>/<%= idPartEnc %>/<%= username %>">\n' +
+        '    <input type="hidden" name = "username" id="username " value="<%= username %>">\n' +
+        '    <input type="hidden" name = "english" id="english" value="true">\n' +
+        '    <a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">English</a>\n' +
+        '</form>';
+</script>
+<% } %>
+
 </html>
 

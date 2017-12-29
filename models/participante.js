@@ -10,7 +10,6 @@ module.exports = function(sequelize, DataTypes) {
         classMethods: {
             associate: function(models) {
                 Participante.hasMany(models.Sesion_user);
-                Participante.hasMany(models.Voto);
                 Participante.hasMany(models.Sesion);
             }
         }

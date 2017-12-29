@@ -1,0 +1,97 @@
+!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
+    <style>
+        .bg-primary {
+            background-color: #7dcaa5 !important; }
+        .bg-secondary {
+            background-color: #053434 !important; }
+        .bg-img {
+            position: relative;
+            background-image: url('/public/img/decision.jpg');
+            background-size: 100% 125%
+        }
+
+    </style>
+
+</head>
+
+<body id="page-top">
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg bg-secondary fixed-top text-uppercase" id="mainNav">
+    <div class="container">
+        <% if (!locals.user) { %>
+        <a class="navbar-brand nav-link js-scroll-trigger" href="/en">Home</a>
+        <% } else { %>
+        <% if (locals.user.registrado) { %>
+        <a class="navbar-brand nav-link js-scroll-trigger" href="/en">Home</a>
+        <% } %>
+        <% if (locals.user.pass) { %>
+        <a class="navbar-brand nav-link js-scroll-trigger" href="/homeAdmin">Home</a>
+        <% }; %>
+        <% }; %>
+
+        <button class="navbar-toggler navbar-toggler-right text-uppercase bg-primary text-white rounded" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/en/#portfolio">Create game</a>
+                </li>
+                <% if (!locals.user) { %>
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/login_en">Sign in</a>
+                </li>
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/sign_up">Sign up</a>
+                </li>
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/loginAdmin_en">Sign in as admin</a>
+                </li>
+                <% } else { %>
+                <% if (locals.user.registrado) { %>
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/historial_en">Sesion record</a>
+                </li>
+                <% } %>
+                <% if (locals.user.pass) { %>
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/agregarDecision">Add decision</a>
+                </li>
+                <% }; %>
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/logout_en">Logout</a>
+                </li>
+                <% }; %>
+                <li id="langButton" class="nav-item mx-0 mx-lg-1">
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

@@ -1,4 +1,5 @@
 module.exports  = function mueveReloj (hor, minut, segund, idSesion, indexEsc, listaSesiones, io) {
+    if (listaSesiones[idSesion] == undefined) return;
     indexEsc2 = listaSesiones[idSesion].IdxEscActual;
     if (indexEsc != indexEsc2) return;
     var hour = hor;

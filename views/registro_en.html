@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>I T F O R C E</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="/public/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="/public/css/freelancer.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/style.css" />
+</head>
+<%- include("layout_en.html"); %>
+<body>
+<section class="portfolio" id="portfolio">
+    <div class="container">
+        <p></p>
+        <% if (error.length > 0) { %>
+        <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        <p><h2 class="page-header">Sign up on our page!</h2></p>
+        <form method="post" action="/registro">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="form-control" placeholder="Username" name="username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" placeholder="Email" name="email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" placeholder="Password" name="password">
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" class="form-control" placeholder="Password" name="password2">
+            </div>
+            <input type="hidden" name = "english" id="english" value="true">
+            <button type="submit" class="btn btn-default">Sign in</button>
+        </form>
+    </div>
+</section>
+</body>
+
+<script>
+    document.getElementById("langButton").innerHTML =
+        '<form id="lang" method="get" action="/registro">\n' +
+        '<a href="#" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" onclick="document.getElementById(\'lang\').submit()">Español</a>\n' +
+        '</form>';
+</script>
+</html>
